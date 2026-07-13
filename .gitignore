@@ -1,0 +1,12 @@
+/build
+/.idea
+/target
+maven-wrapper.jar
+.DS_Store
+.settings/
+bin/
+
+.project
+.classpath
+.factorypath
+/.vscode
