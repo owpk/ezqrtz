@@ -5,20 +5,20 @@ import org.quartz.*;
 import java.util.function.Supplier;
 
 /**
- * Стратегия обработки коллизий заданий и триггеров в планировщике.
+ * Strategy for handling job and trigger collisions in the scheduler.
  *
  * @author Vyacheslav Vorobev
  */
 public interface CollisionStrategy {
 
     /**
-     * Обрабатывает коллизию между существующим и новым заданием/триггером.
+     * Handles a collision between an existing and a new job/trigger.
      *
-     * @param scheduler        планировщик Quartz
-     * @param jobKey           ключ конфликтующего задания
-     * @param jobDetailFactory фабрика для создания нового описания задания
-     * @param triggerFactory   фабрика для создания нового триггера
-     * @return true, если коллизия обработана, false в противном случае
+     * @param scheduler        the Quartz scheduler
+     * @param jobKey           the key of the conflicting job
+     * @param jobDetailFactory factory for creating a new job detail
+     * @param triggerFactory   factory for creating a new trigger
+     * @return true if the collision was handled, false otherwise
      */
     boolean handle(
             Scheduler scheduler,

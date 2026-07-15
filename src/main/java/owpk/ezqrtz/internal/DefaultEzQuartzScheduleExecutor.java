@@ -1,14 +1,9 @@
 package owpk.ezqrtz.internal;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
-import owpk.ezqrtz.api.CollisionStrategy;
-import owpk.ezqrtz.api.EzQuartzScheduleExecutor;
-import owpk.ezqrtz.api.QuartzTriggerNamesapce;
-import owpk.ezqrtz.api.SchedulerInterceptor;
-import owpk.ezqrtz.exception.SchedulerOperationException;
-import owpk.ezqrtz.internal.model.*;
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,19 +15,36 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import owpk.ezqrtz.api.CollisionStrategy;
+import owpk.ezqrtz.api.EzQuartzScheduleExecutor;
+import owpk.ezqrtz.api.QuartzTriggerNamesapce;
+import owpk.ezqrtz.api.SchedulerInterceptor;
+import owpk.ezqrtz.exception.SchedulerOperationException;
+import owpk.ezqrtz.internal.model.CronTriggerDefinition;
+import owpk.ezqrtz.internal.model.OnceTriggerDefinition;
+import owpk.ezqrtz.internal.model.RepeatTriggerDefinition;
+import owpk.ezqrtz.internal.model.ScheduleRequest;
+import owpk.ezqrtz.internal.model.ScheduleResult;
+import owpk.ezqrtz.internal.model.SchedulerNamespace;
 
 /**
- * Реализация {@link EzQuartzScheduleExecutor} по умолчанию.
+ * Default implementation of {@link EzQuartzScheduleExecutor}.
  * <p>
- * Инкапсулирует работу с Quartz {@link Scheduler}: создание, удаление,
- * приостановку и возобновление задач и триггеров. Все операции с ключами
- * выполняются через {@link SchedulerNamespace}, что обеспечивает изоляцию
- * групп jobs/triggers. Перед каждой операцией планирования вызываются
- * зарегистрированные {@link SchedulerInterceptor}.
+ * Encapsulates work with the Quartz {@link Scheduler}: creation, deletion,
+ * suspension and resumption of jobs and triggers. All operations with keys
+ * are performed through {@link SchedulerNamespace}, ensuring isolation of
+ * job/trigger groups. Before each scheduling operation, registered
+ * {@link SchedulerInterceptor} instances are invoked.
  *
  * @author Vyacheslav Vorobev
  */
@@ -74,18 +86,18 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     }
 
     /**
-     * Планирует новую задачу согласно {@link ScheduleRequest}.
+     * Schedules a new job according to {@link ScheduleRequest}.
      * <p>
-     * Сначала разрешается коллизия с уже существующей задачей через
-     * {@link CollisionStrategy}. Если коллизия не разрешена — задача не
-     * планируется. Перед и после планирования вызываются перехватчики
-     * {@link SchedulerInterceptor#beforeSchedule} и
-     * {@link SchedulerInterceptor#afterSchedule} соответственно.
+     * First, a collision with an existing job is resolved through
+     * {@link CollisionStrategy}. If the collision is not resolved — the job is not
+     * scheduled. Before and after scheduling, interceptors
+     * {@link SchedulerInterceptor#beforeSchedule} and
+     * {@link SchedulerInterceptor#afterSchedule} are called, respectively.
      *
-     * @param request         описание параметров планирования
-     * @param quartzNamesapce - пространство имен групп Quartz
-     * @return результат с флагом {@code scheduled} и временем следующего запуска
-     * @throws SchedulerOperationException если Quartz выбросил {@link SchedulerException}
+     * @param request         the scheduling parameters description
+     * @param quartzNamesapce - Quartz group namespace
+     * @return result with {@code scheduled} flag and next fire time
+     * @throws SchedulerOperationException if Quartz throws a {@link SchedulerException}
      */
     public ScheduleResult schedule(ScheduleRequest request, QuartzTriggerNamesapce quartzNamesapce) {
         try {
@@ -128,16 +140,16 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     }
 
     /**
-     * Перепланирует существующий триггер новыми параметрами из {@link ScheduleRequest}.
+     * Reschedules an existing trigger with new parameters from {@link ScheduleRequest}.
      * <p>
-     * Если триггер не найден — возвращает {@code scheduled=false} без исключения.
-     * Перед и после перепланирования вызываются перехватчики
-     * {@link SchedulerInterceptor#beforeReschedule} и
-     * {@link SchedulerInterceptor#afterReschedule}.
+     * If the trigger is not found — returns {@code scheduled=false} without exception.
+     * Before and after rescheduling, interceptors
+     * {@link SchedulerInterceptor#beforeReschedule} and
+     * {@link SchedulerInterceptor#afterReschedule} are called.
      *
-     * @param request новые параметры планирования
-     * @return результат с флагом {@code scheduled} и обновлённым временем следующего запуска
-     * @throws SchedulerOperationException если Quartz выбросил {@link SchedulerException}
+     * @param request new scheduling parameters
+     * @return result with {@code scheduled} flag and updated next fire time
+     * @throws SchedulerOperationException if Quartz throws a {@link SchedulerException}
      */
     @Override
     public ScheduleResult reschedule(ScheduleRequest request) {
@@ -276,13 +288,13 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     }
 
     /**
-     * Проверяет, существует ли уже задача с указанным идентификатором,
-     * и если да — делегирует разрешение коллизии стратегии {@link CollisionStrategy}.
+     * Checks whether a job with the specified identity already exists,
+     * and if it does, delegates collision resolution to the {@link CollisionStrategy}.
      *
-     * @param collisionStrategy стратегия обработки коллизии
-     * @param jobIdentity       идентификатор задачи
-     * @return {@code true}, если можно создавать новую задачу; {@code false}, если стратегия запретила
-     * @throws SchedulerException при ошибке обращения к планировщику
+     * @param collisionStrategy collision handling strategy
+     * @param jobIdentity       job identity
+     * @return {@code true} if a new job can be created; {@code false} if the strategy prohibited it
+     * @throws SchedulerException if an error occurs while accessing the scheduler
      */
     public boolean resolveCollision(
             QuartzTriggerNamesapce quartzNamesapce,
@@ -304,11 +316,11 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     }
 
     /**
-     * Создаёт {@link JobDetail} на основе параметров из {@link ScheduleRequest}:
-     * класс задачи, идентификатор, описание, JobDataMap, флаги durability и recovery.
+     * Creates a {@link JobDetail} based on the parameters from {@link ScheduleRequest}:
+     * the job class, identity, description, JobDataMap, and the durability/recovery flags.
      *
-     * @param request параметры планирования
-     * @return готовый {@link JobDetail}
+     * @param request scheduling parameters
+     * @return a ready {@link JobDetail}
      */
     public JobDetail createJobDetails(ScheduleRequest request, QuartzTriggerNamesapce quartzNamesapce) {
         var jobDataMap = new JobDataMap();
@@ -331,18 +343,18 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     }
 
     /**
-     * Создаёт {@link Trigger} на основе типа расписания из {@link ScheduleRequest}.
+     * Creates a {@link Trigger} based on the schedule type from {@link ScheduleRequest}.
      * <p>
-     * Поддерживаются три типа:
+     * Three types are supported:
      * <ul>
-     *   <li>{@link CronTriggerDefinition} — cron-выражение</li>
-     *   <li>{@link OnceTriggerDefinition} — одиночный запуск в заданный момент</li>
-     *   <li>{@link RepeatTriggerDefinition} — повторяющийся запуск с интервалом</li>
+     *   <li>{@link CronTriggerDefinition} — a cron expression</li>
+     *   <li>{@link OnceTriggerDefinition} — a single execution at a specified moment</li>
+     *   <li>{@link RepeatTriggerDefinition} — a repeated execution at a given interval</li>
      * </ul>
-     * Если задан {@link ScheduleRequest#triggerCustomizer()}, он применяется к builder'у.
+     * If {@link ScheduleRequest#triggerCustomizer()} is provided, it is applied to the builder.
      *
-     * @param request параметры планирования
-     * @return готовый {@link Trigger}
+     * @param request scheduling parameters
+     * @return a ready {@link Trigger}
      */
     public Trigger createTrigger(ScheduleRequest request, QuartzTriggerNamesapce quartzNamesapce) {
         var builder = newTrigger()

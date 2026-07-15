@@ -1,48 +1,48 @@
 package owpk.ezqrtz.api;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
- * Настраивает определения {@link Trigger} Quartz с использованием builder-паттерна.
+ * Configures Quartz {@link Trigger} definitions using the builder pattern.
  *
- * @param <T> тип {@link TriggerBuilder}, который настраивается
+ * @param <T> the type of {@link TriggerBuilder} being configured
  * @author Vyacheslav Vorobev
  */
 public interface TriggerCustomizer<T extends TriggerBuilder<Trigger>> {
 
     /**
-     * Настраивает указанный builder триггера с помощью маппера ключа триггера.
+     * Configures the specified trigger builder using a trigger key mapper.
      *
-     * @param triggerKeyMapper функция для создания {@link TriggerKey} из имени триггера
-     * @param triggerBuilder   builder триггера для настройки
+     * @param triggerKeyMapper function for creating a {@link TriggerKey} from a trigger name
+     * @param triggerBuilder   trigger builder to configure
      */
     void customize(Function<String, TriggerKey> triggerKeyMapper, T triggerBuilder);
 
     /**
-     * Настраивает builder триггера с использованием фиксированной группы триггеров.
+     * Configures the trigger builder using a fixed trigger group.
      *
-     * @param triggerGroup   имя группы для триггера
-     * @param triggerBuilder builder триггера для настройки
+     * @param triggerGroup   name of the group for the trigger
+     * @param triggerBuilder trigger builder to configure
      */
     default void customize(String triggerGroup, T triggerBuilder) {
         customize(triggerName -> new TriggerKey(triggerName, triggerGroup), triggerBuilder);
     }
 
     /**
-     * Пытается получить существующий триггер из планировщика с использованием указанного маппера ключей и группы.
+     * Attempts to retrieve an existing trigger from the scheduler using the provided key mapper and group.
      *
-     * @param triggerKeyMapper функция для создания {@link TriggerKey}
-     * @param triggerGroup     группа триггеров (используется как входные данные для маппера ключей)
-     * @param fb               фабрика bean-компонентов планировщика
-     * @param exceptionHandler обработчик для любых исключений при поиске
-     * @return {@link Optional}, содержащий триггер, если найден, или пустой, если нет
+     * @param triggerKeyMapper function for creating a {@link TriggerKey}
+     * @param triggerGroup     trigger group (used as input for the key mapper)
+     * @param fb               scheduler bean factory
+     * @param exceptionHandler handler for any exceptions that occur during lookup
+     * @return {@link Optional} containing the trigger if found, or empty otherwise
      */
     default Optional<Trigger> customize(Function<String, TriggerKey> triggerKeyMapper, String triggerGroup, SchedulerFactoryBean fb,
                                         Consumer<Throwable> exceptionHandler) {

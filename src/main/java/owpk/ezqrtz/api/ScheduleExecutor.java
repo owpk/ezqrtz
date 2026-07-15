@@ -3,26 +3,26 @@ package owpk.ezqrtz.api;
 import owpk.ezqrtz.internal.model.ScheduleResult;
 
 /**
- * Исполнитель для планирования и перепланирования заданий.
+ * Executor for scheduling and rescheduling jobs.
  *
- * @param <T> тип запроса на планирование
+ * @param <T> the type of scheduling request
  * @author Vyacheslav Vorobev
  */
 public interface ScheduleExecutor<T> {
 
     /**
-     * Планирует новое задание на основе данного запроса.
+     * Schedules a new job based on the given request.
      *
-     * @param request запрос на планирование
-     * @return результат операции планирования
+     * @param request the scheduling request
+     * @return the result of the scheduling operation
      */
     ScheduleResult schedule(T request);
 
     /**
-     * Перепланирует существующее задание на основе данного запроса.
+     * Reschedules an existing job based on the given request.
      *
-     * @param request запрос на перепланирование
-     * @return результат операции перепланирования
+     * @param request the rescheduling request
+     * @return the result of the rescheduling operation
      */
     ScheduleResult reschedule(T request);
 }

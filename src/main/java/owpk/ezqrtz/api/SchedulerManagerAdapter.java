@@ -1,49 +1,49 @@
 package owpk.ezqrtz.api;
 
 /**
- * Адаптер для общих операций планировщика над заданиями и триггерами.
+ * Adapter for common scheduler operations on jobs and triggers.
  *
  * @author Vyacheslav Vorobev
  */
 public interface SchedulerManagerAdapter {
 
     /**
-     * Проверяет, существует ли задание или триггер с указанным идентификатором.
+     * Checks whether a job or trigger with the specified identity exists.
      *
-     * @param identity идентификатор задания или триггера
-     * @return true, если существует, false в противном случае
+     * @param identity job or trigger identity
+     * @return true if it exists, false otherwise
      */
     boolean exists(String identity);
 
     /**
-     * Удаляет задание и триггер с указанным идентификатором.
+     * Deletes the job and trigger with the specified identity.
      *
-     * @param identity идентификатор задания или триггера
-     * @return true, если успешно удалено, false в противном случае
+     * @param identity job or trigger identity
+     * @return true if deleted successfully, false otherwise
      */
     boolean delete(String identity);
 
     /**
-     * Активирует (запускает) задание с указанным идентификатором.
+     * Triggers (starts) the job with the specified identity.
      *
-     * @param identity идентификатор задания
-     * @return true, если успешно активировано, false в противном случае
+     * @param identity job identity
+     * @return true if triggered successfully, false otherwise
      */
     boolean trigger(String identity);
 
     /**
-     * Ставит на паузу задание или триггер с указанным идентификатором.
+     * Pauses the job or trigger with the specified identity.
      *
-     * @param identity идентификатор задания или триггера
-     * @return true, если успешно поставлено на паузу, false в противном случае
+     * @param identity job or trigger identity
+     * @return true if paused successfully, false otherwise
      */
     boolean pause(String identity);
 
     /**
-     * Снимает с паузы задание или триггер с указанным идентификатором.
+     * Resumes the job or trigger with the specified identity.
      *
-     * @param identity идентификатор задания или триггера
-     * @return true, если успешно снято с паузы, false в противном случае
+     * @param identity job or trigger identity
+     * @return true if resumed successfully, false otherwise
      */
     boolean resume(String identity);
 }

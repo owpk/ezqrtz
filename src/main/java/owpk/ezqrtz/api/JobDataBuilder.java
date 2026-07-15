@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Builder для пар ключ-значение карты данных задания Quartz.
+ * Builder for key-value pairs of the Quartz job data map.
  *
  * @author Vyacheslav Vorobev
  */
@@ -16,18 +16,18 @@ public record JobDataBuilder(
 ) {
 
     /**
-     * Конструктор по умолчанию, создающий пустой builder карты данных задания.
+     * Default constructor, creates an empty job data map builder.
      */
     public JobDataBuilder() {
         this(new HashMap<>());
     }
 
     /**
-     * Добавляет пару ключ-значение в карту данных задания.
+     * Adds a key-value pair to the job data map.
      *
-     * @param key   ключ
-     * @param value значение
-     * @return данный builder для цепочки вызовов
+     * @param key   the key
+     * @param value the value
+     * @return this builder for method chaining
      */
     public JobDataBuilder put(String key, Object value) {
         values.put(key, value);

@@ -4,25 +4,25 @@ import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 
 /**
- * Фабрика namespace для создания ключей триггеров и заданий Quartz.
+ * Namespace factory for creating Quartz trigger and job keys.
  *
  * @author Vyacheslav Vorobev
  */
 public interface QuartzTriggerNamesapce {
 
     /**
-     * Создаёт ключ триггера для указанного идентификатора.
+     * Creates a trigger key for the given identity.
      *
-     * @param identity идентификатор триггера
-     * @return созданный ключ триггера
+     * @param identity trigger identity
+     * @return the created trigger key
      */
     TriggerKey triggerKey(String identity);
 
     /**
-     * Создаёт ключ задания для указанного идентификатора.
+     * Creates a job key for the given identity.
      *
-     * @param identity идентификатор задания
-     * @return созданный ключ задания
+     * @param identity job identity
+     * @return the created job key
      */
     JobKey jobKey(String identity);
 }

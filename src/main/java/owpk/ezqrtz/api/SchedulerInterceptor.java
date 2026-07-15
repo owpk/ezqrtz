@@ -5,42 +5,42 @@ import owpk.ezqrtz.internal.model.ScheduleRequest;
 import java.time.LocalDate;
 
 /**
- * Перехватчик для операций планирования и перепланирования.
+ * Interceptor for scheduling and rescheduling operations.
  *
  * @author Vyacheslav Vorobev
  */
 public interface SchedulerInterceptor {
 
     /**
-     * Вызывается перед планированием задания.
+     * Called before scheduling a job.
      *
-     * @param request запрос на планирование
+     * @param request scheduling request
      */
     default void beforeSchedule(ScheduleRequest request) {
     }
 
     /**
-     * Вызывается после планирования задания.
+     * Called after scheduling a job.
      *
-     * @param request      запрос на планирование
-     * @param nextFireTime время следующего срабатывания запланированного задания
+     * @param request      scheduling request
+     * @param nextFireTime the next fire time of the scheduled job
      */
     default void afterSchedule(ScheduleRequest request, LocalDate nextFireTime) {
     }
 
     /**
-     * Вызывается перед перепланированием задания.
+     * Called before rescheduling a job.
      *
-     * @param request запрос на перепланирование
+     * @param request rescheduling request
      */
     default void beforeReschedule(ScheduleRequest request) {
     }
 
     /**
-     * Вызывается после перепланирования задания.
+     * Called after rescheduling a job.
      *
-     * @param request      запрос на перепланирование
-     * @param nextFireTime время следующего срабатывания перепланированного задания
+     * @param request      rescheduling request
+     * @param nextFireTime the next fire time of the rescheduled job
      */
     default void afterReschedule(ScheduleRequest request, LocalDate nextFireTime) {
     }

@@ -1,34 +1,34 @@
 # backend-quartz-starter
 
-Spring-библиотека для удобной работы с **Quartz Scheduler**. Предоставляет DSL для программируемого планирования, декларативные аннотации для задания и автоматическую настройку persistent-хранилища Quartz с C3P0-пулом соединений.
+A Spring library for convenient work with the **Quartz Scheduler**. It provides a DSL for programmatic scheduling, declarative job annotations, and automatic configuration of Quartz persistent storage with a C3P0 connection pool.
 
-## Основная концепция
+## Core concept
 
-Библиотека закрывает три типичные боли Quartz:
+The library addresses three common Quartz pain points:
 
-1. **Сложность создания заданий и триггеров** — вместо многострочных builder-цепочек достаточно одного `ScheduleRequest`.
-2. **Ручная регистрация и поддержка bean'ов** — аннотация `@ezCronJob` автоматически сканирует, регистрирует и планирует задания при старте приложения.
-3. **Настройка persistent-хранилища** — `QuartzConfig` автоматически создаёт DataSource на основе `quartz.properties`, настраивает C3P0-пул, транзакции и Spring-интеграцию.
+1. **Complex job and trigger creation** — instead of long builder chains, a single `ScheduleRequest` is enough.
+2. **Manual bean registration and support** — the `@ezCronJob` annotation automatically scans, registers, and schedules jobs at application startup.
+3. **Persistent storage configuration** — `QuartzConfig` automatically creates a DataSource from `quartz.properties`, configures the C3P0 pool, transactions, and Spring integration.
 
-## Быстрый старт
+## Quick start
 
-Добавьте `@EnableezQuartzScheduler` на конфигурационный класс:
+Add `@EnableEzQuartzScheduler` to a configuration class:
 
 ```java
-@EnableezQuartzScheduler
+@EnableEzQuartzScheduler
 @Configuration
 public class AppConfig { }
 ```
 
-Подключите `quartz.properties` в classpath с конфигурацией DataSource (driver, URL, user, password, maxConnections) и стандартных параметров Quartz (job store, thread pool, clustering).
+Place `quartz.properties` on the classpath with DataSource configuration (driver, URL, user, password, maxConnections) and standard Quartz settings (job store, thread pool, clustering).
 
 ---
 
-## 1. Программируемое планирование — ScheduleRequest DSL
+## 1. Programmatic scheduling — ScheduleRequest DSL
 
-`ScheduleRequest` — builder-объект, инкапсулирующий всю конфигурацию задания и триггера. Передайте его в `ScheduleExecutor` — и библиотека создаст job, trigger и запланирует запуск.
+`ScheduleRequest` is a builder object that encapsulates the entire configuration of a job and trigger. Pass it to `ScheduleExecutor`, and the library will create the job, trigger, and schedule the execution.
 
-### Пример
+### Example
 
 ```java
 @Autowired
@@ -38,7 +38,7 @@ ScheduleRequest request = ScheduleRequest.builder()
         .jobClass(MyJob.class)
         .jobIdentity("my-job")
         .triggerIdentity("my-trigger")
-        .description("Ежедневная выгрузка отчётов")
+        .description("Daily report export")
         .durable(true)
         .collisionStrategy(CollisionStrategyType.REPLACE_AND_RESCHEDULE_IF_EXISTS)
         .jobDataCustomizer(map -> map.put("param", "value"))
@@ -48,15 +48,16 @@ ScheduleRequest request = ScheduleRequest.builder()
 ScheduleResult result = executor.schedule(request);
 ```
 
-### Что под капотом
+### What happens under the hood
 
-`DefaultezQuartzScheduleExecutor` на основе `ScheduleRequest`:
-- создаёт `JobDetail` (с описанием, JobDataMap, флагами durability и recovery);
-- создаёт `Trigger` (Cron / Once / Repeat) с применением кастомизаторов;
-- обрабатывает коллизии через `CollisionStrategy` (SKIP, FAIL, REMOVE, REPLACE_AND_RESCHEDULE_IF_EXISTS и др.);
-- вызывает `SchedulerInterceptor` до и после операций.
+`DefaultezQuartzScheduleExecutor` uses `ScheduleRequest` to:
 
-### Кастомизация
+- create a `JobDetail` (with description, JobDataMap, and durability/recovery flags);
+- create a `Trigger` (Cron / Once / Repeat) with customizers applied;
+- handle collisions through `CollisionStrategy` (SKIP, FAIL, REMOVE, REPLACE_AND_RESCHEDULE_IF_EXISTS, and others);
+- invoke `SchedulerInterceptor` before and after operations.
+
+### Customization
 
 ```java
 ScheduleRequest request = ScheduleRequest.builder()
@@ -65,21 +66,21 @@ ScheduleRequest request = ScheduleRequest.builder()
         .build();
 ```
 
-### Типы триггеров
+### Trigger types
 
-| Тип | Класс | Описание |
-|-----|-------|----------|
-| Cron | `CronTriggerDefinition` | Cron-расписание с поддержкой timezone |
-| Однократный | `OnceTriggerDefinition` | Запуск в конкретный момент времени |
-| Повторяющийся | `RepeatTriggerDefinition` | Интервал + количество повторений |
+| Type | Class | Description |
+|-----|-------|-------------|
+| Cron | `CronTriggerDefinition` | Cron schedule with timezone support |
+| One-time | `OnceTriggerDefinition` | Runs at a specific point in time |
+| Repeating | `RepeatTriggerDefinition` | Interval-based repeated execution |
 
 ---
 
-## 2. Декларативное планирование — @ezCronJob
+## 2. Declarative scheduling — @ezCronJob
 
-Аннотация `@ezCronJob` превращает Spring-bean в планируемую задачу. Библиотека автоматически сканирует marked-классы, регистрирует их в job-реестре и планирует при старте приложения.
+The `@ezCronJob` annotation turns a Spring bean into a scheduled job. The library automatically scans marked classes, registers them in the job registry, and schedules them at startup.
 
-### Пример
+### Example
 
 ```java
 import owpk.ezqrtz.annotations.CronTriggerJob;
@@ -90,45 +91,49 @@ import owpk.ezqrtz.annotations.Execute;
         group = "reports",
         cron = "0 0 12 * * ?",
         zoneId = "Europe/Moscow",
-        description = "Ежедневная выгрузка отчётов",
+        description = "Daily report export",
         collisionStrategy = CollisionStrategyType.REPLACE_AND_RESCHEDULE_IF_EXISTS,
 )
 public class DailyReportJob {
 
     @Execute
     public void execute(JobExecutionContext context) {
-        // логика задания
+        // job logic
     }
 }
 ```
 
-### Аргументы аннотации
+### Annotation arguments
 
-| Аргумент | Обязательный | Описание |
-|----------|:-----------:|----------|
-| `name` | ✅ | Идентификатор задания и триггера |
-| `group` | ✅ | Группа Quartz для изоляции |
-| `cron` | ✅ | Cron-выражение |
-| `description` | ✅ | Описание задания |
-| `zoneId` | | Часовой пояс (по умолчанию — системный) |
-| `collisionStrategy` | | Стратегия обработки коллизий |
-| `enabled` | | Вкл/выкл регистрацию задания |
+| Argument | Required | Description |
+|----------|:--------:|-------------|
+| `name` | ✅ | Job and trigger identifier |
+| `group` | ✅ | Quartz group for isolation |
+| `cron` | ✅ | Cron expression |
+| `description` | ✅ | Job description |
+| `zoneId` | | Time zone (defaults to the system zone) |
+| `collisionStrategy` | | Collision handling strategy |
+| `enabled` | | Enables or disables job registration |
 
-### Как это работает
+### How it works
 
-1. `QuartzBeanPostProcessor` сканирует контекст на bean'ы с `@ezCronJob`.
-2. `ezQuartzJobRegistrar` создаёт `ScheduleRequest` из атрибутов аннотации и планирует задание через `DefaultezQuartzScheduleExecutor`.
-3. Все аннотированные задания автоматически планируются при старте приложения.
+1. `QuartzBeanPostProcessor` scans the context for beans annotated with `@ezCronJob`.
+2. `ezQuartzJobRegistrar` creates a `ScheduleRequest` from the annotation attributes and schedules the job via `DefaultezQuartzScheduleExecutor`.
+3. All annotated jobs are automatically scheduled at startup.
 
 ---
 
-## 3. Автоматическая настройка Quartz + БД
+## 3. Automatic Quartz + database setup
 
-`QuartzConfig` полностью автоматизирует конфигурацию Quartz при наличии `quartz.properties` в classpath.
+`QuartzConfig` fully automates Quartz configuration when `quartz.properties` is present on the classpath.
 
 ### quartz.properties
 
 ```properties
+# Configure Main Scheduler Properties
+org.quartz.scheduler.instanceName=my-cool-scheduling-cluster
+org.quartz.scheduler.instanceId=AUTO
+
 # Job Store
 org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX
 org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate
@@ -139,7 +144,7 @@ org.quartz.jobStore.clusterCheckinInterval=10000
 org.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool
 org.quartz.threadPool.threadCount=10
 
-# DataSource (используется Quartz)
+# DataSource (used by Quartz)
 org.quartz.dataSource.quartzDataSource.driver=com.mysql.cj.jdbc.Driver
 org.quartz.dataSource.quartzDataSource.URL=jdbc:mysql://localhost:3306/quartz
 org.quartz.dataSource.quartzDataSource.user=root
@@ -147,31 +152,31 @@ org.quartz.dataSource.quartzDataSource.password=secret
 org.quartz.dataSource.quartzDataSource.maxConnections=10
 ```
 
-### Что настраивается автоматически
+### What is configured automatically
 
-- **C3P0 DataSource** — создаётся пул соединений на основе параметров из `quartz.properties`.
-- **SchedulerFactoryBean** — конфигурируется с DataSource, транзакциями (PlatformTransactionManager), Spring-интеграцией (AutowiringSpringBeanJobFactory), глобальными слушателями и флагами shutdown.
-- **Spring-интеграция** — `@Autowired` работает внутри `Job.execute()`.
-- **Логирование** — при старте выводится информация о планировщике (имя, ID, job store, thread pool, кластеризация, версия).
+- **C3P0 DataSource** — creates a connection pool from the parameters in `quartz.properties`.
+- **SchedulerFactoryBean** — configured with DataSource, transactions (PlatformTransactionManager), Spring integration (AutowiringSpringBeanJobFactory), global listeners, and shutdown flags.
+- **Spring integration** — `@Autowired` works inside `Job.execute()`.
+- **Logging** — startup prints scheduler information such as name, ID, job store, thread pool, clustering, and version.
 
-### Схема БД
+### Database schema
 
-Для persistent-режима создайте таблицы Quartz в вашей БД. Скрипты доступны в дистрибутиве Quartz:
+For persistent mode, create the Quartz tables in your database. The scripts are available in the Quartz distribution:
 
 ```
 quartz-*.jar/org/quartz/impl/jdbcjobstore/tables_*.sql
 ```
 
-Выберите `.sql`-файл, соответствующий вашей СУБД (например, `tables_mysql_innodb.sql` для MySQL).
+Choose the `.sql` file that matches your database (for example, `tables_mysql_innodb.sql` for MySQL).
 
 ---
 
-## Стратегии обработки коллизий
+## Collision handling strategies
 
-| Тип | Поведение |
+| Type | Behavior |
 |-----|----------|
-| `FAIL` | Бросает `JobCollisionException` |
-| `SKIP` | Пропускает планирование, если задание уже существует |
-| `REMOVE` | Удаляет существующее задание, создаёт новое |
-| `SKIP_AND_REPLACE_JOB_DATA` | Пропускает, но обновляет JobDataMap |
-| `REPLACE_AND_RESCHEDULE_IF_EXISTS` | Перепланирует существующий триггер новыми параметрами (по умолчанию) |
+| `FAIL` | Throws `JobCollisionException` |
+| `SKIP` | Skips scheduling if the job already exists |
+| `REMOVE` | Removes the existing job and creates a new one |
+| `SKIP_AND_REPLACE_JOB_DATA` | Skips but updates the JobDataMap |
+| `REPLACE_AND_RESCHEDULE_IF_EXISTS` | Reschedules the existing trigger with new parameters (default) |

@@ -3,7 +3,7 @@ package owpk.ezqrtz.api;
 import org.quartz.JobDataMap;
 
 /**
- * Настраивает {@link org.quartz.JobDataMap} Quartz с использованием функционального интерфейса.
+ * Customizes {@link org.quartz.JobDataMap} Quartz using a functional interface.
  *
  * @author Vyacheslav Vorobev
  */
@@ -11,17 +11,17 @@ import org.quartz.JobDataMap;
 public interface JobDataMapCustomizer {
 
     /**
-     * Настраивает указанную карту данных задания.
+     * Customizes the specified job data map.
      *
-     * @param jobDataMap карта данных задания для настройки
+     * @param jobDataMap the job data map to customize
      */
     void customize(JobDataMap jobDataMap);
 
     /**
-     * Возвращает составной кастомизатор, который сначала применяет этот кастомизатор, затем указанный after.
+     * Returns a composed customizer that first applies this customizer, then the specified after customizer.
      *
-     * @param after кастомизатор, который применяется после этого
-     * @return составной кастомизатор
+     * @param after the customizer to apply after this one
+     * @return a composed customizer
      */
     default JobDataMapCustomizer andThen(JobDataMapCustomizer after) {
         return jobDataMap -> {

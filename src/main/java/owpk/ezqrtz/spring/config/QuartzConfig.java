@@ -1,13 +1,19 @@
 package owpk.ezqrtz.spring.config;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -15,27 +21,31 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import owpk.ezqrtz.api.SchedulerInterceptor;
 import owpk.ezqrtz.service.JobsListenerService;
 import owpk.ezqrtz.spring.EzQuartzJobRegistrar;
 import owpk.ezqrtz.spring.QuartzBeanPostProcessor;
 import owpk.ezqrtz.spring.QuartzStartup;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-
 @RequiredArgsConstructor
 @Slf4j
 public class QuartzConfig {
-    public static final String PROPS_DS_DRIVER = "org.quartz.dataSource.quartzDataSource.driver";
-    public static final String PROPS_DS_URLS = "org.quartz.dataSource.quartzDataSource.URL";
-    public static final String PROPS_DS_USER = "org.quartz.dataSource.quartzDataSource.user";
-    public static final String PROPS_DS_PASS = "org.quartz.dataSource.quartzDataSource.password";
-    public static final String PROPS_DS_MAX_CONN = "org.quartz.dataSource.quartzDataSource.maxConnections";
+
+    //@formatter:off
+    public static final String PROPS_DS_DRIVER =    "org.quartz.dataSource.quartzDataSource.driver";
+    public static final String PROPS_DS_URLS =      "org.quartz.dataSource.quartzDataSource.URL";
+    public static final String PROPS_DS_USER =      "org.quartz.dataSource.quartzDataSource.user";
+    public static final String PROPS_DS_PASS =      "org.quartz.dataSource.quartzDataSource.password";
+    public static final String PROPS_DS_MAX_CONN =  "org.quartz.dataSource.quartzDataSource.maxConnections";
+    //@formatter:on
+
     private final Environment environment;
+
     @Value("${ez.quartz.config.path:quartz.properties}")
     private String quartzConfigPath;
 
@@ -54,11 +64,27 @@ public class QuartzConfig {
         return new QuartzStartup(registrar);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    QuartzSchemaDetector defaultQuartzSchemaDetector() {
+        return new DefaultQuartzSchemaDetector();
+    }
+
+    @Bean
+    QuartzSchemaInitializer quartzSchemaInitializer(@Qualifier("quartzDataSource") DataSource quartzDataSource,
+                                                    QuartzSchemaDetector quartzSchemaDetector) {
+        return new QuartzSchemaInitializer(quartzDataSource, environment, quartzSchemaDetector);
+    }
+
     /**
      * C3P0 default pool
-     * <a href="https://www.mchange.com/projects/c3p0/#using_combopooleddatasource">c3po pool config</a>
+     * <a href=
+     * "https://www.mchange.com/projects/c3p0/#using_combopooleddatasource">c3po
+     * pool config</a>
      */
-    public DataSource ds(Properties props) {
+    @Bean(name = "quartzDataSource")
+    DataSource quartzDataSource() throws IOException {
+        var props = quartzProps();
         var dsDriver = prop(props, PROPS_DS_DRIVER);
         var dsUrl = prop(props, PROPS_DS_URLS);
         var dsUser = prop(props, PROPS_DS_USER);
@@ -96,13 +122,14 @@ public class QuartzConfig {
     SchedulerFactoryBean schedulerFactoryBean(
             PlatformTransactionManager txManager,
             SpringBeanJobFactory jobFactory,
-            JobsListenerService jobsListenerService, Trigger... triggers) throws Exception {
+            JobsListenerService jobsListenerService,
+            @Qualifier("quartzDataSource") DataSource quartzDataSource,
+            Trigger... triggers) throws Exception {
 
         var props = quartzProps();
         var schedulerFactory = new SchedulerFactoryBean();
-        var ds = ds(props);
         schedulerFactory.setQuartzProperties(props);
-        schedulerFactory.setDataSource(ds);
+        schedulerFactory.setDataSource(quartzDataSource);
         schedulerFactory.setTransactionManager(txManager);
         schedulerFactory.setJobFactory(jobFactory);
         schedulerFactory.setGlobalJobListeners(jobsListenerService);
@@ -139,9 +166,11 @@ public class QuartzConfig {
 
         var props = factoryBean.getObject();
         var propsWithVariables = new Properties();
+
         Objects.requireNonNull(props)
                 .stringPropertyNames()
-                .forEach(name -> propsWithVariables.put(name, environment.resolvePlaceholders(props.getProperty(name))));
+                .forEach(name -> propsWithVariables.put(
+                    name, environment.resolvePlaceholders(props.getProperty(name))));
 
         return propsWithVariables;
     }
@@ -151,22 +180,22 @@ public class QuartzConfig {
         return args -> {
             var scheduler = schedulerFactoryBean.getScheduler();
             log.info("""
-                            
-                            --- Quartz Scheduler Info ---
-                            Scheduler Name: {}
-                            Instance ID: {}
-                            Scheduler Class: {}
-                            Is Started: {}
-                            Is In Standby Mode: {}
-                            Is Shutdown: {}
-                            Job Store Class: {}
-                            Thread Pool Class: {}
-                            Number of Jobs Executed: {}
-                            Clustered: {}
-                            Version: {}
-                            --------------------------------
-                            
-                            """, scheduler.getSchedulerName(),
+
+                    --- Ez Quartz Scheduler Info ---
+                    Scheduler Name: {}
+                    Instance ID: {}
+                    Scheduler Class: {}
+                    Is Started: {}
+                    Is In Standby Mode: {}
+                    Is Shutdown: {}
+                    Job Store Class: {}
+                    Thread Pool Class: {}
+                    Number of Jobs Executed: {}
+                    Clustered: {}
+                    Version: {}
+                    --------------------------------
+
+                    """, scheduler.getSchedulerName(),
                     scheduler.getSchedulerInstanceId(),
                     scheduler.getClass().getName(),
                     scheduler.isStarted(),

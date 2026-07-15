@@ -7,144 +7,144 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Расширенный исполнитель планирования Quartz с операциями управления заданиями и триггерами.
+ * Advanced Quartz scheduling executor with job and trigger management operations.
  *
  * @author Vyacheslav Vorobev
  */
 public interface EzQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequest> {
 
     /**
-     * Возвращает базовый планировщик Quartz.
+     * Returns the underlying Quartz scheduler.
      *
-     * @return планировщик Quartz
+     * @return the Quartz scheduler
      */
     Scheduler getScheduler();
 
     /**
-     * Ставит на паузу задание с указанным идентификатором.
+     * Pauses the job with the given identity.
      *
-     * @param identity идентификатор задания
-     * @return true, если успешно поставлено на паузу, false в противном случае
+     * @param identity job identity
+     * @return true if successfully paused, false otherwise
      */
     boolean pauseJob(String identity);
 
     /**
-     * Ставит на паузу триггер с указанным идентификатором.
+     * Pauses the trigger with the given identity.
      *
-     * @param identity идентификатор триггера
-     * @return true, если успешно поставлено на паузу, false в противном случае
+     * @param identity trigger identity
+     * @return true if successfully paused, false otherwise
      */
     boolean pauseTrigger(String identity);
 
     /**
-     * Снимает с паузы задание с указанным идентификатором.
+     * Resumes the job with the given identity.
      *
-     * @param identity идентификатор задания
-     * @return true, если успешно снято с паузы, false в противном случае
+     * @param identity job identity
+     * @return true if successfully resumed, false otherwise
      */
     boolean resumeJob(String identity);
 
     /**
-     * Снимает с паузы триггер с указанным идентификатором.
+     * Resumes the trigger with the given identity.
      *
-     * @param identity идентификатор триггера
-     * @return true, если успешно снято с паузы, false в противном случае
+     * @param identity trigger identity
+     * @return true if successfully resumed, false otherwise
      */
     boolean resumeTrigger(String identity);
 
     /**
-     * Удаляет задание с указанным идентификатором.
+     * Deletes the job with the given identity.
      *
-     * @param identity идентификатор задания
-     * @return true, если успешно удалено, false в противном случае
+     * @param identity job identity
+     * @return true if successfully deleted, false otherwise
      */
     boolean deleteJob(String identity);
 
     /**
-     * Проверяет, существует ли задание с указанным идентификатором.
+     * Checks if a job with the given identity exists.
      *
-     * @param identity идентификатор задания
-     * @return true, если существует, false в противном случае
+     * @param identity job identity
+     * @return true if exists, false otherwise
      */
     boolean jobExists(String identity);
 
     /**
-     * Проверяет, существует ли триггер с указанным идентификатором.
+     * Checks if a trigger with the given identity exists.
      *
-     * @param identity идентификатор триггера
-     * @return true, если существует, false в противном случае
+     * @param identity trigger identity
+     * @return true if exists, false otherwise
      */
     boolean triggerExists(String identity);
 
     /**
-     * Ставит на паузу задание с указанным идентификатором, обрабатывая ошибки через колбэк.
+     * Pauses the job with the given identity, handling errors via callback.
      *
-     * @param identity идентификатор задания
-     * @param onError  колбэк, вызываемый при ошибке
+     * @param identity job identity
+     * @param onError  error callback
      */
     void pauseJob(String identity, Consumer<Exception> onError);
 
     /**
-     * Ставит на паузу триггер с указанным идентификатором, обрабатывая ошибки через колбэк.
+     * Pauses the trigger with the given identity, handling errors via callback.
      *
-     * @param identity идентификатор триггера
-     * @param onError  колбэк, вызываемый при ошибке
+     * @param identity trigger identity
+     * @param onError  error callback
      */
     void pauseTrigger(String identity, Consumer<Exception> onError);
 
     /**
-     * Снимает с паузы задание с указанным идентификатором, обрабатывая ошибки через колбэк.
+     * Resumes the job with the given identity, handling errors via callback.
      *
-     * @param identity идентификатор задания
-     * @param onError  колбэк, вызываемый при ошибке
+     * @param identity job identity
+     * @param onError  error callback
      */
     void resumeJob(String identity, Consumer<Exception> onError);
 
     /**
-     * Снимает с паузы триггер с указанным идентификатором, обрабатывая ошибки через колбэк.
+     * Resumes the trigger with the given identity, handling errors via callback.
      *
-     * @param identity идентификатор триггера
-     * @param onError  колбэк, вызываемый при ошибке
+     * @param identity trigger identity
+     * @param onError  error callback
      */
     void resumeTrigger(String identity, Consumer<Exception> onError);
 
     /**
-     * Удаляет задание с указанным идентификатором, обрабатывая ошибки через колбэк.
+     * Deletes the job with the given identity, handling errors via callback.
      *
-     * @param identity идентификатор задания
-     * @param onError  колбэк, вызываемый при ошибке
+     * @param identity job identity
+     * @param onError  error callback
      */
     void deleteJob(String identity, Consumer<Exception> onError);
 
     /**
-     * Возвращает триггер с указанным идентификатором.
+     * Returns the trigger with the given identity.
      *
-     * @param identity идентификатор триггера
-     * @return Optional, содержащий триггер, если найден
+     * @param identity trigger identity
+     * @return Optional containing the trigger if found
      */
     Optional<Trigger> getTrigger(String identity);
 
     /**
-     * Возвращает ключ триггера для указанного идентификатора.
+     * Returns the trigger key for the given identity.
      *
-     * @param identity идентификатор триггера
-     * @return ключ триггера
+     * @param identity trigger identity
+     * @return the trigger key
      */
     TriggerKey getTriggerKey(String identity);
 
     /**
-     * Возвращает описание задания с указанным идентификатором.
+     * Returns the job description with the given identity.
      *
-     * @param identity идентификатор задания
-     * @return Optional, содержащий описание задания, если найдено
+     * @param identity job identity
+     * @return Optional containing the job description if found
      */
     Optional<JobDetail> getJob(String identity);
 
     /**
-     * Возвращает ключ задания для указанного идентификатора.
+     * Returns the job key for the given identity.
      *
-     * @param identity идентификатор задания
-     * @return ключ задания
+     * @param identity job identity
+     * @return the job key
      */
     JobKey getJobKey(String identity);
 }
