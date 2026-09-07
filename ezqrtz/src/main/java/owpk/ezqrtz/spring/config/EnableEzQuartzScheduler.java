@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Import({QuartzConfig.class})
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface EnableCztQuartzScheduler {
+public @interface EnableEzQuartzScheduler {
 }

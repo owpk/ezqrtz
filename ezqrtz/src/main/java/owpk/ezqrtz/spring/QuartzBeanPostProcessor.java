@@ -1,6 +1,6 @@
 package owpk.ezqrtz.spring;
 
-import owpk.ezqrtz.core.annotations.CztCronJob;
+import owpk.ezqrtz.core.annotations.EzCronJob;
 import owpk.ezqrtz.core.annotations.Execute;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.support.AopUtils;
@@ -15,15 +15,15 @@ import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class QuartzBeanPostProcessor implements BeanPostProcessor {
-    private final CztQuartzJobRegistrar registrar;
+    private final EzQuartzJobRegistrar registrar;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanClass = AopUtils.getTargetClass(bean);
 
-        CztCronJob cztQuartzJob = AnnotationUtils.findAnnotation(
+        EzCronJob cztQuartzJob = AnnotationUtils.findAnnotation(
                 bean.getClass(),
-                CztCronJob.class);
+                EzCronJob.class);
 
         if (cztQuartzJob == null)
             return bean;

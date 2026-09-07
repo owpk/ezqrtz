@@ -5,18 +5,18 @@ package owpk.ezqrtz.management.api.rest.ex;
  * Абстрактный намеренно: инстанцируются только конкретные подтипы,
  * что позволяет писать исчерпывающие switch по иерархии без default-ветки.
  */
-public abstract sealed class CztSchedulerManagementException extends RuntimeException
+public abstract sealed class EzSchedulerManagementException extends RuntimeException
         permits
         AdapterNotFoundException,
         SchedulerOperationException,
         JobNotFound,
         TriggerNotFound {
 
-    protected CztSchedulerManagementException(String message) {
+    protected EzSchedulerManagementException(String message) {
         super(message);
     }
 
-    protected CztSchedulerManagementException(Throwable e) {
+    protected EzSchedulerManagementException(Throwable e) {
         super(e);
     }
 }

@@ -1,6 +1,6 @@
 package owpk.ezqrtz.core.exception;
 
-public final class SchedulerOperationException extends CztQuartzException {
+public final class SchedulerOperationException extends EzQuartzException {
 
     public SchedulerOperationException(String msg) {
         super(msg);

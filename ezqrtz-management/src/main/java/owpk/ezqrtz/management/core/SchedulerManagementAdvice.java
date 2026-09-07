@@ -1,8 +1,8 @@
 package owpk.ezqrtz.management.core;
 
-import owpk.ezqrtz.management.api.rest.ex.CztRemoteSchedulerOperationException;
+import owpk.ezqrtz.management.api.rest.ex.EzRemoteSchedulerOperationException;
 import owpk.ezqrtz.management.api.rest.ex.AdapterNotFoundException;
-import owpk.ezqrtz.management.api.rest.ex.CztSchedulerManagementException;
+import owpk.ezqrtz.management.api.rest.ex.EzSchedulerManagementException;
 import owpk.ezqrtz.management.api.rest.ex.JobNotFound;
 import owpk.ezqrtz.management.api.rest.ex.SchedulerOperationException;
 import owpk.ezqrtz.management.api.rest.ex.TriggerNotFound;
@@ -16,20 +16,20 @@ public class SchedulerManagementAdvice {
 
     public record ApiError(String code, String message) {}
 
-    @ExceptionHandler(CztSchedulerManagementException.class)
-    public ResponseEntity<ApiError> handleManagementException(CztSchedulerManagementException e) {
+    @ExceptionHandler(EzSchedulerManagementException.class)
+    public ResponseEntity<ApiError> handleManagementException(EzSchedulerManagementException e) {
         var entry = mapManagementException(e);
         return ResponseEntity.status(entry.httpStatus())
                 .body(new ApiError(entry.errCode(), e.getMessage()));
     }
 
-    @ExceptionHandler(CztRemoteSchedulerOperationException.class)
-    public ResponseEntity<ApiError> handleRemoteSchedulerException(CztRemoteSchedulerOperationException e) {
+    @ExceptionHandler(EzRemoteSchedulerOperationException.class)
+    public ResponseEntity<ApiError> handleRemoteSchedulerException(EzRemoteSchedulerOperationException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError("REMOTE_SCHEDULER_OPERATION_ERROR", e.getMessage()));
     }
 
-    private ErrEntry mapManagementException(CztSchedulerManagementException e) {
+    private ErrEntry mapManagementException(EzSchedulerManagementException e) {
         // sealed-иерархия: switch исчерпывающий, при добавлении нового типа
         // компилятор потребует обработать его здесь
         return switch (e) {

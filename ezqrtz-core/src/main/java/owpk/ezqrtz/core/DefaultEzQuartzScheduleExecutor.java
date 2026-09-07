@@ -1,7 +1,7 @@
 package owpk.ezqrtz.core;
 
 import owpk.ezqrtz.core.api.CollisionStrategy;
-import owpk.ezqrtz.core.api.CztQuartzScheduleExecutor;
+import owpk.ezqrtz.core.api.EzQuartzScheduleExecutor;
 import owpk.ezqrtz.core.api.QuartzTriggerNamesapce;
 import owpk.ezqrtz.core.api.SchedulerInterceptor;
 import owpk.ezqrtz.core.exception.SchedulerOperationException;
@@ -37,7 +37,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
- * Реализация {@link CztQuartzScheduleExecutor} по умолчанию.
+ * Реализация {@link EzQuartzScheduleExecutor} по умолчанию.
  * <p>
  * Инкапсулирует работу с Quartz {@link Scheduler}: создание, удаление,
  * приостановку и возобновление задач и триггеров. Все операции с ключами
@@ -48,36 +48,36 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * @author Vyacheslav Vorobev
  */
 @Slf4j
-public class DefaultCztQuartzScheduleExecutor implements CztQuartzScheduleExecutor {
+public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor {
 
     protected final List<SchedulerInterceptor> interceptors;
     protected final QuartzTriggerNamesapce namespace;
     @Getter
     private final Scheduler scheduler;
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            List<SchedulerInterceptor> interceptors) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           List<SchedulerInterceptor> interceptors) {
         this.namespace = new SchedulerNamespace();
         this.scheduler = scheduler;
         this.interceptors = interceptors;
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            List<SchedulerInterceptor> interceptors,
-                                            QuartzTriggerNamesapce namespace) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           List<SchedulerInterceptor> interceptors,
+                                           QuartzTriggerNamesapce namespace) {
         this.namespace = namespace;
         this.scheduler = scheduler;
         this.interceptors = interceptors;
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            QuartzTriggerNamesapce namespace) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           QuartzTriggerNamesapce namespace) {
         this(scheduler, List.of(), namespace);
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            String triggerGroup,
-                                            String jobGroup) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           String triggerGroup,
+                                           String jobGroup) {
         this(scheduler, List.of(), SchedulerNamespace.builder()
                 .triggerGroup(triggerGroup)
                 .jobGroup(jobGroup)

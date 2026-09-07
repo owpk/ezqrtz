@@ -9,7 +9,7 @@ public class SpringJobBridge implements Job {
 
     @SuppressWarnings("all")
     @Autowired
-    private CztQuartzJobRegistrar registrar;
+    private EzQuartzJobRegistrar registrar;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {

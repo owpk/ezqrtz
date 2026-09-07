@@ -2,7 +2,7 @@ package owpk.ezqrtz.spring.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import owpk.ezqrtz.core.api.SchedulerInterceptor;
-import owpk.ezqrtz.spring.CztQuartzJobRegistrar;
+import owpk.ezqrtz.spring.EzQuartzJobRegistrar;
 import owpk.ezqrtz.spring.QuartzBeanPostProcessor;
 import owpk.ezqrtz.spring.QuartzStartup;
 import lombok.RequiredArgsConstructor;
@@ -47,17 +47,17 @@ public class QuartzConfig {
     private String quartzConfigPath;
 
     @Bean
-    CztQuartzJobRegistrar jobRegistrar(Scheduler sfb, List<SchedulerInterceptor> interceptors) {
-        return new CztQuartzJobRegistrar(sfb, interceptors);
+    EzQuartzJobRegistrar jobRegistrar(Scheduler sfb, List<SchedulerInterceptor> interceptors) {
+        return new EzQuartzJobRegistrar(sfb, interceptors);
     }
 
     @Bean
-    QuartzBeanPostProcessor quartzBeanPostProcessor(CztQuartzJobRegistrar registrar) {
+    QuartzBeanPostProcessor quartzBeanPostProcessor(EzQuartzJobRegistrar registrar) {
         return new QuartzBeanPostProcessor(registrar);
     }
 
     @Bean
-    QuartzStartup quartzStartup(CztQuartzJobRegistrar registrar) {
+    QuartzStartup quartzStartup(EzQuartzJobRegistrar registrar) {
         return new QuartzStartup(registrar);
     }
 

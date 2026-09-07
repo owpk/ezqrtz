@@ -7,7 +7,7 @@ import owpk.ezqrtz.management.api.dto.TriggerDefCreateDto;
 import owpk.ezqrtz.management.api.dto.TriggerDefUpdateDto;
 import owpk.ezqrtz.management.api.dto.TriggerModifiedResult;
 import owpk.ezqrtz.management.api.rest.JobDataMapper;
-import owpk.ezqrtz.management.api.rest.ex.CztRemoteSchedulerOperationException;
+import owpk.ezqrtz.management.api.rest.ex.EzRemoteSchedulerOperationException;
 import owpk.ezqrtz.management.api.model.JobDef;
 import owpk.ezqrtz.management.api.model.RemoteAdapterInfo;
 import owpk.ezqrtz.management.api.model.TriggerDef;
@@ -26,9 +26,9 @@ public interface SchedulingManagementRestAdapterV1 {
 
     List<JobDefInfoDto> listRegisteredJobs();
 
-    JobDefDto getJob(String id) throws CztRemoteSchedulerOperationException;
+    JobDefDto getJob(String id) throws EzRemoteSchedulerOperationException;
 
-    TriggerDef getTrigger(String id) throws CztRemoteSchedulerOperationException;
+    TriggerDef getTrigger(String id) throws EzRemoteSchedulerOperationException;
 
     Set<String> listTriggerGroups();
 

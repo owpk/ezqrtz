@@ -1,6 +1,6 @@
 package owpk.ezqrtz.management.api.rest.ex;
 
-public final class SchedulerOperationException extends CztSchedulerManagementException {
+public final class SchedulerOperationException extends EzSchedulerManagementException {
 
     public SchedulerOperationException(String message) {
         super(message);

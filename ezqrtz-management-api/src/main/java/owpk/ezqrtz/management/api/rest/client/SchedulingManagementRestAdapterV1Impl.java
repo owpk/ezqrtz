@@ -5,8 +5,8 @@ import owpk.ezqrtz.management.api.dto.JobDefInfoDto;
 import owpk.ezqrtz.management.api.dto.TriggerDefCreateDto;
 import owpk.ezqrtz.management.api.dto.TriggerDefUpdateDto;
 import owpk.ezqrtz.management.api.dto.TriggerModifiedResult;
-import owpk.ezqrtz.management.api.rest.ex.CztRemoteSchedulerOperationException;
-import owpk.ezqrtz.management.api.rest.ex.CztSchedulerManagementException;
+import owpk.ezqrtz.management.api.rest.ex.EzRemoteSchedulerOperationException;
+import owpk.ezqrtz.management.api.rest.ex.EzSchedulerManagementException;
 import owpk.ezqrtz.management.api.InboundSchedulerManager;
 import owpk.ezqrtz.management.api.model.RemoteAdapterInfo;
 import owpk.ezqrtz.management.api.model.Result;
@@ -55,14 +55,14 @@ public class SchedulingManagementRestAdapterV1Impl implements SchedulingManageme
     }
 
     @Override
-    public JobDefDto getJob(String id) throws CztRemoteSchedulerOperationException {
+    public JobDefDto getJob(String id) throws EzRemoteSchedulerOperationException {
         return inboundSchedulerManager.getJob(id)
                 .map(this::mapJob)
                 .getOrElseThrow(this::unwrapFailure);
     }
 
     @Override
-    public TriggerDef getTrigger(String id) throws CztRemoteSchedulerOperationException {
+    public TriggerDef getTrigger(String id) throws EzRemoteSchedulerOperationException {
         return inboundSchedulerManager.getTrigger(id)
                 .getOrElseThrow(this::unwrapFailure);
     }
@@ -73,9 +73,9 @@ public class SchedulingManagementRestAdapterV1Impl implements SchedulingManageme
      * остальное оборачивается в CztRemoteSchedulerOperationException (500).
      */
     private RuntimeException unwrapFailure(Throwable err) {
-        if (err instanceof CztSchedulerManagementException czt)
+        if (err instanceof EzSchedulerManagementException czt)
             return czt;
-        return new CztRemoteSchedulerOperationException(err);
+        return new EzRemoteSchedulerOperationException(err);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SchedulingManagementRestAdapterV1Impl implements SchedulingManageme
     }
 
     private TriggerModifiedResult buildTriggerResult(String id, Result<Boolean> result, String action) {
-        if (result.isFailure() && result.err() instanceof CztSchedulerManagementException czt)
+        if (result.isFailure() && result.err() instanceof EzSchedulerManagementException czt)
             throw czt;
 
         boolean success = result.isSuccess() && result.getOrElse(false);

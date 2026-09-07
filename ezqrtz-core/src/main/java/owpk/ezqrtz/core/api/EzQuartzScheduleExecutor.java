@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  *
  * @author Vyacheslav Vorobev
  */
-public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequest> {
+public interface EzQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequest> {
 
     /**
      * Возвращает базовый планировщик Quartz.
