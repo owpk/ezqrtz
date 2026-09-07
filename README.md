@@ -10,6 +10,82 @@ The library addresses three common Quartz pain points:
 2. **Manual bean registration and support** — the `@ezCronJob` annotation automatically scans, registers, and schedules jobs at application startup.
 3. **Persistent storage configuration** — `QuartzConfig` automatically creates a DataSource from `quartz.properties`, configures the C3P0 pool, transactions, and Spring integration.
 
+## Publishing to GitHub Packages
+
+This project can be published as a Maven artifact to GitHub Packages so you can consume it from local Spring Boot applications.
+
+### What you need
+- A public GitHub repository.
+- A GitHub token with `read:packages` and `write:packages` permissions.
+- A repository secret named `GITHUB_TOKEN` (or use the default `GITHUB_TOKEN` in Actions).
+
+### Publish flow
+1. Push the project to GitHub.
+2. Create a release tag, for example `v2.0.1`.
+3. GitHub Actions will publish the artifact automatically.
+
+### Consume from another Maven project
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <name>GitHub Packages</name>
+        <url>https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.ocrv.helper</groupId>
+    <artifactId>spring-boot-starter-ez-quartz</artifactId>
+    <version>2.0.1</version>
+</dependency>
+```
+
+### Consume from a Gradle project
+
+For Groovy DSL:
+
+```groovy
+repositories {
+    maven {
+        url = uri('https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz')
+        credentials {
+            username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+            password = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN')
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.ocrv.helper:spring-boot-starter-ez-quartz:2.0.1'
+}
+```
+
+For Kotlin DSL:
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation("com.ocrv.helper:spring-boot-starter-ez-quartz:2.0.1")
+}
+```
+
+### Local publish command
+```bash
+./mvnw -B deploy -DskipTests
+```
+
+If you want, the next step can be to add a small `mvnw`/`settings.xml` example for local projects so the dependency is ready to copy-paste.
+
 ## Quick start
 
 Add `@EnableEzQuartzScheduler` to a configuration class:

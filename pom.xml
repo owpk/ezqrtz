@@ -9,6 +9,25 @@
     <version>2.0.1-SNAPSHOT</version>
     <name>spring-boot-starter-ez-quartz</name>
     <description>Spring Boot Easy Quartz Starter</description>
+    <url>https://github.com/ocrv/spring-boot-starter-ez-quartz</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>ocrv</id>
+            <name>OCRV</name>
+            <email>support@ocrv.dev</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/ocrv/spring-boot-starter-ez-quartz.git</connection>
+        <developerConnection>scm:git:https://github.com/ocrv/spring-boot-starter-ez-quartz.git</developerConnection>
+        <url>https://github.com/ocrv/spring-boot-starter-ez-quartz</url>
+    </scm>
 
     <properties>
         <java.version>25</java.version>
@@ -130,13 +149,15 @@
     </dependencyManagement>
 
     <distributionManagement>
-        <!-- <repository>
-            <id>deployment</id>
-            <url>https://nexus.ocrv.com.rzd/repository/maven-releases/</url>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz</url>
         </repository>
         <snapshotRepository>
-            <id>deployment</id>
-            <url>https://nexus.ocrv.com.rzd/repository/maven-snapshots/</url>
-        </snapshotRepository> -->
+            <id>github</id>
+            <name>GitHub Packages Snapshots</name>
+            <url>https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
