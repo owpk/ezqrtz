@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ocrv.helper</groupId>
-    <artifactId>backend-quartz-starter</artifactId>
-    <version>2.0.5-SNAPSHOT</version>
+    <groupId>owpk.ezqrtz</groupId>
+    <artifactId>ezqrtz-starter</artifactId>
+    <version>2.0.5</version>
     <packaging>pom</packaging>
-    <name>backend-quartz-starter</name>
-    <description>Spring Boot Backend Service Quartz Starter</description>
+    <name>easy-quartz-starter</name>
+    <description>Spring Boot EZ Quartz Starter</description>
     <modules>
-        <module>czt-qrtz-core</module>
-        <module>czt-qrtz</module>
-        <module>czt-qrtz-management-api</module>
-        <module>czt-qrtz-management</module>
+        <module>ezqrtz</module>
+        <module>ezqrtz-core</module>
+        <module>ezqrtz-management-api</module>
+        <module>ezqrtz-management</module>
     </modules>
 
     <properties>
@@ -120,7 +120,7 @@
         </repository>
         <snapshotRepository>
             <id>deployment</id>
-            <url>https://nexus.ocrv.com.rzd/repository/maven-snapshots/</url>
+            <url>https://nexus.ocrv.com.rzd/repository/mavens/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

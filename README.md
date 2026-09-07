@@ -166,13 +166,7 @@ org.quartz.dataSource.quartzDataSource.maxConnections=10
 
 ### Схема БД
 
-Для persistent-режима создайте таблицы Quartz в вашей БД. Скрипты доступны в дистрибутиве Quartz:
-
-```
-quartz-*.jar/org/quartz/impl/jdbcjobstore/tables_*.sql
-```
-
-Выберите `.sql`-файл, соответствующий вашей СУБД (например, `tables_mysql_innodb.sql` для MySQL).
+Настраивается автоматически 
 
 ---
 
@@ -265,7 +259,7 @@ PUT /v1/scheduling/management/trigger/stop?id=my-trigger
 
 ---
 
-## Стратегии обработки коллизий
+## Стратегии обработки коллизий зарегистрированных заданий
 
 | Тип | Поведение |
 |-----|----------|
