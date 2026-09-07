@@ -1,7 +1,0 @@
-package owpk.ezqrtz.spring.config;
-
-import javax.sql.DataSource;
-
-public interface QuartzSchemaDetector {
-    boolean quartzSchemaExists(DataSource dataSource);
-}

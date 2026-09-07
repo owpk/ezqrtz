@@ -5,29 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ocrv.helper</groupId>
-    <artifactId>spring-boot-starter-ez-quartz</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
-    <name>spring-boot-starter-ez-quartz</name>
-    <description>Spring Boot Easy Quartz Starter</description>
-    <url>https://github.com/ocrv/spring-boot-starter-ez-quartz</url>
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <id>ocrv</id>
-            <name>OCRV</name>
-            <email>support@ocrv.dev</email>
-        </developer>
-    </developers>
-    <scm>
-        <connection>scm:git:https://github.com/ocrv/spring-boot-starter-ez-quartz.git</connection>
-        <developerConnection>scm:git:https://github.com/ocrv/spring-boot-starter-ez-quartz.git</developerConnection>
-        <url>https://github.com/ocrv/spring-boot-starter-ez-quartz</url>
-    </scm>
+    <artifactId>backend-quartz-starter</artifactId>
+    <version>2.0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>backend-quartz-starter</name>
+    <description>Spring Boot Backend Service Quartz Starter</description>
+    <modules>
+        <module>czt-qrtz-core</module>
+        <module>czt-qrtz</module>
+        <module>czt-qrtz-management-api</module>
+        <module>czt-qrtz-management</module>
+    </modules>
 
     <properties>
         <java.version>25</java.version>
@@ -39,28 +27,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0-loom</artifactId>
-            <version>0.14.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.cronutils</groupId>
-            <artifactId>cron-utils</artifactId>
-            <version>9.2.0</version>
         </dependency>
     </dependencies>
 
@@ -132,7 +98,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
@@ -150,14 +115,12 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz</url>
+            <id>deployment</id>
+            <url>https://nexus.ocrv.com.rzd/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Packages Snapshots</name>
-            <url>https://maven.pkg.github.com/ocrv/spring-boot-starter-ez-quartz</url>
+            <id>deployment</id>
+            <url>https://nexus.ocrv.com.rzd/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

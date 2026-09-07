@@ -1,0 +1,16 @@
+package com.ocrv.helper.quartz.core.exception;
+
+public final class SchedulerOperationException extends CztQuartzException {
+
+    public SchedulerOperationException(String msg) {
+        super(msg);
+    }
+
+    public SchedulerOperationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SchedulerOperationException(Throwable cause) {
+        super(cause);
+    }
+}
