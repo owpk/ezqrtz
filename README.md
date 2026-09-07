@@ -101,7 +101,7 @@ import com.ocrv.helper.quartz.annotations.Execute;
         cron = "0 0 12 * * ?",
         zoneId = "Europe/Moscow",
         description = "Ежедневная выгрузка отчётов",
-        collisionStrategy = CollisionStrategyType.REPLACE_AND_RESCHEDULE_IF_EXISTS,
+        collisionStrategy = CollisionStrategyType.REPLACE_AND_RESCHEDULE_IF_EXISTS
 )
 public class DailyReportJob {
 
