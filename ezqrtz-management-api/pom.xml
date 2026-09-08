@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>ezqrtz-management-api</artifactId>
+    <name>ezqrtz management API</name>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>

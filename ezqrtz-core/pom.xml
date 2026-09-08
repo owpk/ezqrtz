@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>ezqrtz-core</artifactId>
+    <name>ezqrtz core</name>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>

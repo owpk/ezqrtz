@@ -10,7 +10,7 @@
 
     <packaging>pom</packaging>
 
-    <name>ezqrtz</name>
+    <name>ezqrtz Starter</name>
     <description>Spring Boot EZ Quartz Starter</description>
     <url>https://github.com/owpk/ezqrtz</url>
 
