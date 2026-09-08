@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.owpk/ezqrtz)](https://central.sonatype.com/artifact/io.github.owpk/ezqrtz)
+
 [🇬🇧 English version](README.md)
 
 # Easy Quartz 
@@ -12,6 +14,34 @@ Spring-библиотека для удобной работы с **Quartz Sched
 2. **Ручная регистрация и поддержка bean'ов** — аннотация `@EzCronJob` автоматически сканирует, регистрирует и планирует задания при старте приложения.
 3. **Настройка persistent-хранилища** — `QuartzConfig` автоматически создаёт DataSource на основе `quartz.properties`, настраивает C3P0-пул, транзакции и Spring-интеграцию.
 4. **Управление заданиями в рантайме** — REST API (`@EnableEzQuartzSchedulerManagement`) позволяет просматривать, создавать, обновлять, запускать и останавливать триггеры без перезапуска приложения.
+
+## Установка
+
+Библиотека опубликована в Maven Central. Добавьте зависимость `ezqrtz` — она включает ядро с DSL и management API.
+
+**Maven:**
+
+```xml
+<dependency>
+    <groupId>io.github.owpk</groupId>
+    <artifactId>ezqrtz</artifactId>
+    <version>2.0.5</version>
+</dependency>
+```
+
+**Gradle (Groovy DSL):**
+
+```groovy
+implementation 'io.github.owpk:ezqrtz:2.0.5'
+```
+
+**Gradle (Kotlin DSL):**
+
+```kotlin
+implementation("io.github.owpk:ezqrtz:2.0.5")
+```
+
+Отдельные модули (`ezqrtz-core`, `ezqrtz-management-api`, `ezqrtz-management`) также можно подключать по отдельности — см. [Состав модулей](#состав-модулей).
 
 ## Быстрый старт
 
