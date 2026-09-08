@@ -1,0 +1,72 @@
+package io.owpk.ezqrtz.management.api.rest.controller;
+
+import io.owpk.ezqrtz.management.api.dto.JobDefDto;
+import io.owpk.ezqrtz.management.api.dto.JobDefInfoDto;
+import io.owpk.ezqrtz.management.api.dto.TriggerDefCreateDto;
+import io.owpk.ezqrtz.management.api.dto.TriggerDefUpdateDto;
+import io.owpk.ezqrtz.management.api.dto.TriggerModifiedResult;
+import io.owpk.ezqrtz.management.api.rest.ex.EzRemoteSchedulerOperationException;
+import io.owpk.ezqrtz.management.api.model.RemoteAdapterInfo;
+import io.owpk.ezqrtz.management.api.model.RemoteSchedulerProps;
+import io.owpk.ezqrtz.management.api.model.TriggerDef;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+public interface SchedulingManagementOutboundAdapterV1 {
+
+    List<RemoteSchedulerProps> listAdapters();
+
+    JobDefDto getJob(
+            String id,
+            String adapterId) throws EzRemoteSchedulerOperationException;
+
+    JobDefInfoDto getJobDefinition(
+            String id,
+            String adapterId);
+
+    List<JobDefInfoDto> listJobs(
+            String adapterId);
+
+    TriggerDef getTrigger(
+            String id,
+            String adapterId) throws EzRemoteSchedulerOperationException;
+
+    Set<String> listTriggerGroups(
+            String adapterId);
+
+    List<TriggerDef> listTriggers(
+            String adapterId,
+            String id,
+            String description,
+            String group,
+            String name,
+            String cronExpression,
+            LocalDateTime nextFireTimeFrom,
+            LocalDateTime nextFireTimeTo);
+
+    TriggerModifiedResult createTrigger(
+            TriggerDefCreateDto def,
+            String adapterId,
+            LocalDateTime startAt,
+            LocalDateTime endAt);
+
+    TriggerModifiedResult updateTrigger(
+            TriggerDefUpdateDto def,
+            String adapterId,
+            LocalDateTime startAt,
+            LocalDateTime endAt);
+
+    TriggerModifiedResult startTrigger(
+            String id,
+            String adapterId);
+
+    TriggerModifiedResult stopTrigger(
+            String id,
+            String adapterId);
+
+    RemoteAdapterInfo getInfo(
+            String adapterId);
+
+}

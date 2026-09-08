@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>owpk.ezqrtz</groupId>
+        <groupId>io.github.owpk</groupId>
         <artifactId>ezqrtz-starter</artifactId>
         <version>2.0.5</version>
     </parent>
@@ -19,21 +19,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>owpk.ezqrtz</groupId>
+            <groupId>io.github.owpk</groupId>
             <artifactId>ezqrtz-core</artifactId>
-            <version>2.0.5</version>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.owpk</groupId>
+            <artifactId>ezqrtz-management</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>owpk.ezqrtz</groupId>
-            <artifactId>ezqrtz-management</artifactId>
-            <version>2.0.5</version>
         </dependency>
 
         <dependency>
