@@ -121,6 +121,11 @@ fi
 # Deploy
 # ---------------------------------------------------------------------------
 
+export GPG_TTY=$(tty)
+
+gpgconf --kill gpg-agent
+gpgconf --launch gpg-agent
+
 MVN="mvn"
 # [[ -x "./mvnw" ]] && MVN="./mvnw"
 
