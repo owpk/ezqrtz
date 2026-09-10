@@ -1,5 +1,28 @@
 package io.owpk.ezqrtz.core;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+
 import io.owpk.ezqrtz.core.api.CollisionStrategy;
 import io.owpk.ezqrtz.core.api.EzQuartzScheduleExecutor;
 import io.owpk.ezqrtz.core.api.QuartzTriggerNamesapce;
@@ -13,28 +36,6 @@ import io.owpk.ezqrtz.core.model.ScheduleResult;
 import io.owpk.ezqrtz.core.model.SchedulerNamespace;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Реализация {@link EzQuartzScheduleExecutor} по умолчанию.
@@ -136,6 +137,12 @@ public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor
     @Override
     public ScheduleResult schedule(ScheduleRequest request) {
         return schedule(request, namespace);
+    }
+
+    public ScheduleResult schedule(Consumer<ScheduleRequest.ScheduleRequestBuilder> factory) {
+        var builder = ScheduleRequest.builder();
+        factory.accept(builder);
+        return schedule(builder.build());
     }
 
     /**

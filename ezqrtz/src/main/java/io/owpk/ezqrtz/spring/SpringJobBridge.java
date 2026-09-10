@@ -5,9 +5,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@SuppressWarnings("all")
 public class SpringJobBridge implements Job {
 
-    @SuppressWarnings("all")
     @Autowired
     private EzQuartzJobRegistrar registrar;
 

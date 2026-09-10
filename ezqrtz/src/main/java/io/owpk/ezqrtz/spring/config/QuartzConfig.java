@@ -1,15 +1,16 @@
 package io.owpk.ezqrtz.spring.config;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import io.owpk.ezqrtz.core.api.SchedulerInterceptor;
-import io.owpk.ezqrtz.spring.EzQuartzJobRegistrar;
-import io.owpk.ezqrtz.spring.QuartzBeanPostProcessor;
-import io.owpk.ezqrtz.spring.QuartzStartup;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -23,11 +24,14 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import io.owpk.ezqrtz.core.api.SchedulerInterceptor;
+import io.owpk.ezqrtz.spring.EzQuartzJobRegistrar;
+import io.owpk.ezqrtz.spring.QuartzBeanPostProcessor;
+import io.owpk.ezqrtz.spring.QuartzStartup;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -52,8 +56,8 @@ public class QuartzConfig {
     }
 
     @Bean
-    QuartzBeanPostProcessor quartzBeanPostProcessor(EzQuartzJobRegistrar registrar) {
-        return new QuartzBeanPostProcessor(registrar);
+    QuartzBeanPostProcessor quartzBeanPostProcessor(ObjectProvider<EzQuartzJobRegistrar> registrarProvider) {
+        return new QuartzBeanPostProcessor(registrarProvider);
     }
 
     @Bean

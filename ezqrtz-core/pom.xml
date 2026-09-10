@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.owpk</groupId>
         <artifactId>ezqrtz-starter</artifactId>
-        <version>2.0.5</version>
+        <version>2.1.0</version>
     </parent>
 
     <artifactId>ezqrtz-core</artifactId>
