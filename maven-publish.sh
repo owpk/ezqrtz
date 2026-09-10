@@ -41,12 +41,19 @@ current_version() {
 bump_version() {
   local version=$1 kind=$2
   local major minor patch rest
-  IFS='.-' read -r major minor patch rest <<< "$version"
+  IFS='.-' read -r major minor patch rest <<<"$version"
   case "$kind" in
-    major) major=$((major + 1)); minor=0; patch=0 ;;
-    minor) minor=$((minor + 1)); patch=0 ;;
-    patch) patch=$((patch + 1)) ;;
-    *) die "Unknown bump kind: '$kind' (expected major|minor|patch)" ;;
+  major)
+    major=$((major + 1))
+    minor=0
+    patch=0
+    ;;
+  minor)
+    minor=$((minor + 1))
+    patch=0
+    ;;
+  patch) patch=$((patch + 1)) ;;
+  *) die "Unknown bump kind: '$kind' (expected major|minor|patch)" ;;
   esac
   echo "$major.$minor.$patch"
 }
@@ -115,7 +122,7 @@ fi
 # ---------------------------------------------------------------------------
 
 MVN="mvn"
-[[ -x "./mvnw" ]] && MVN="./mvnw"
+# [[ -x "./mvnw" ]] && MVN="./mvnw"
 
 echo
 echo "Deploying v${NEW_VERSION}..."
