@@ -46,7 +46,7 @@
 
     <properties>
         <!-- Единственное место, где задаётся версия проекта -->
-        <revision>2.1.0</revision>
+        <revision>2.1.1</revision>
         <java.version>25</java.version>
         <lombok.version>1.18.46</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
