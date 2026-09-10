@@ -25,20 +25,14 @@ Spring-библиотека для удобной работы с **Quartz Sched
 <dependency>
     <groupId>io.github.owpk</groupId>
     <artifactId>ezqrtz</artifactId>
-    <version>2.0.5</version>
+    <version>${ezqrtz.latest.version}</version>
 </dependency>
 ```
 
 **Gradle (Groovy DSL):**
 
 ```groovy
-implementation 'io.github.owpk:ezqrtz:2.0.5'
-```
-
-**Gradle (Kotlin DSL):**
-
-```kotlin
-implementation("io.github.owpk:ezqrtz:2.0.5")
+implementation `io.github.owpk:ezqrtz:$ezqrtzLatestVersion`
 ```
 
 Отдельные модули (`ezqrtz-core`, `ezqrtz-management-api`, `ezqrtz-management`) также можно подключать по отдельности — см. [Состав модулей](#состав-модулей).

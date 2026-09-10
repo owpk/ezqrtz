@@ -25,20 +25,16 @@ The library is published to Maven Central. Add the `ezqrtz` starter dependency â
 <dependency>
     <groupId>io.github.owpk</groupId>
     <artifactId>ezqrtz</artifactId>
-    <version>2.0.5</version>
+    <version>${ezqrtz.latest.version}</version>
 </dependency>
 ```
 
 **Gradle (Groovy DSL):**
 
 ```groovy
-implementation 'io.github.owpk:ezqrtz:2.0.5'
+implementation `io.github.owpk:ezqrtz:$ezqrtzLatestVersion`
 ```
 
-**Gradle (Kotlin DSL):**
-
-```kotlin
-implementation("io.github.owpk:ezqrtz:2.0.5")
 ```
 
 Individual modules (`ezqrtz-core`, `ezqrtz-management-api`, `ezqrtz-management`) can also be connected separately â€” see [Module Overview](#module-overview).
