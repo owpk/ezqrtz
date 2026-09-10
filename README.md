@@ -168,6 +168,17 @@ public class DailyReportJob {
 ### quartz.properties
 
 ```properties
+# Main Scheduler Properties
+org.quartz.scheduler.instanceName=ogo-domain-scheduling-cluster
+org.quartz.scheduler.instanceId=AUTO
+
+# Datasource
+org.quartz.dataSource.quartzDataSource.driver=org.postgresql.Driver
+org.quartz.dataSource.quartzDataSource.URL=jdbc:postgresql://${YOUR_ENV_DB_HOST:localhost}:${YOUR_ENV_DB_PORT:5432}/${YOUR_ENV_DB_NAME:db}
+org.quartz.dataSource.quartzDataSource.user=${YOUR_ENV_DB_USER:postgres}
+org.quartz.dataSource.quartzDataSource.password=${YOUR_ENV_DB_PASS:postgres}
+org.quartz.dataSource.quartzDataSource.maxConnections=10
+
 # Job Store
 org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX
 org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate
@@ -177,13 +188,6 @@ org.quartz.jobStore.clusterCheckinInterval=10000
 # Thread Pool
 org.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool
 org.quartz.threadPool.threadCount=10
-
-# DataSource (used by Quartz)
-org.quartz.dataSource.quartzDataSource.driver=com.mysql.cj.jdbc.Driver
-org.quartz.dataSource.quartzDataSource.URL=jdbc:mysql://localhost:3306/quartz
-org.quartz.dataSource.quartzDataSource.user=root
-org.quartz.dataSource.quartzDataSource.password=secret
-org.quartz.dataSource.quartzDataSource.maxConnections=10
 ```
 
 ### What Is Configured Automatically
