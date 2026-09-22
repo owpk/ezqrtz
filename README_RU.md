@@ -11,9 +11,9 @@ Spring-библиотека для удобной работы с **Quartz Sched
 Библиотека закрывает четыре типичные боли Quartz:
 
 1. **Сложность создания заданий и триггеров** — вместо многострочных builder-цепочек достаточно одного `ScheduleRequest`.
-2. **Ручная регистрация и поддержка bean'ов** — аннотация `@EzCronJob` автоматически сканирует, регистрирует и планирует задания при старте приложения.
+2. **Ручная регистрация и поддержка bean'ов** — аннотация `@CztCronJob` автоматически сканирует, регистрирует и планирует задания при старте приложения.
 3. **Настройка persistent-хранилища** — `QuartzConfig` автоматически создаёт DataSource на основе `quartz.properties`, настраивает C3P0-пул, транзакции и Spring-интеграцию.
-4. **Управление заданиями в рантайме** — REST API (`@EnableEzQuartzSchedulerManagement`) позволяет просматривать, создавать, обновлять, запускать и останавливать триггеры без перезапуска приложения.
+4. **Управление заданиями в рантайме** — REST API (`@EnableCztQuartzSchedulerManagement`) позволяет просматривать, создавать, обновлять, запускать и останавливать триггеры без перезапуска приложения.
 
 ## Установка
 
@@ -32,26 +32,26 @@ Spring-библиотека для удобной работы с **Quartz Sched
 **Gradle (Groovy DSL):**
 
 ```groovy
-implementation `io.github.owpk:ezqrtz:$ezqrtzLatestVersion`
+implementation 'io.github.owpk:ezqrtz:$ezqrtzLatestVersion'
 ```
 
 Отдельные модули (`ezqrtz-core`, `ezqrtz-management-api`, `ezqrtz-management`) также можно подключать по отдельности — см. [Состав модулей](#состав-модулей).
 
 ## Быстрый старт
 
-Добавьте `@EnableEzQuartzScheduler` на конфигурационный класс — этого достаточно для планирования:
+Добавьте `@EnableCztQuartzScheduler` на конфигурационный класс — этого достаточно для планирования:
 
 ```java
-@EnableEzQuartzScheduler
+@EnableCztQuartzScheduler
 @Configuration
 public class AppConfig { }
 ```
 
-Чтобы дополнительно включить управление шедулерами через REST API, добавьте `@EnableEzQuartzSchedulerManagement`:
+Чтобы дополнительно включить управление шедулерами через REST API, добавьте `@EnableCztQuartzSchedulerManagement`:
 
 ```java
-@EnableEzQuartzScheduler
-@EnableEzQuartzSchedulerManagement
+@EnableCztQuartzScheduler
+@EnableCztQuartzSchedulerManagement
 @Configuration
 public class AppConfig { }
 ```
@@ -62,13 +62,26 @@ public class AppConfig { }
 
 ## 1. Программируемое планирование — ScheduleRequest DSL
 
-`ScheduleRequest` — builder-объект, инкапсулирующий всю конфигурацию задания и триггера. Передайте его в `ScheduleExecutor` — и библиотека создаст job, trigger и запланирует запуск.
+`ScheduleRequest` — builder-объект, инкапсулирующий всю конфигурацию задания и триггера. Передайте его в `CztQuartzScheduleExecutor` — и библиотека создаст job, trigger и запланирует запуск.
+
+### Подключение исполнителя
+
+Библиотека не регистрирует исполнителя автоматически — создайте bean `CztQuartzScheduleExecutor` на основе `DefaultCztQuartzScheduleExecutor`:
+
+```java
+@Bean
+public CztQuartzScheduleExecutor scheduleExecutor(Scheduler scheduler) {
+    return new DefaultCztQuartzScheduleExecutor(scheduler, List.of());
+}
+```
+
+Опционально можно задать пространство имён групп Quartz (`SchedulerNamespace`), чтобы изолировать группы jobs/triggers.
 
 ### Пример
 
 ```java
 @Autowired
-private ScheduleExecutor<ScheduleRequest> executor;
+private CztQuartzScheduleExecutor executor;
 
 ScheduleRequest request = ScheduleRequest.builder()
         .jobClass(MyJob.class)
@@ -82,15 +95,20 @@ ScheduleRequest request = ScheduleRequest.builder()
         .build();
 
 ScheduleResult result = executor.schedule(request);
+
+// перепланирование существующего триггера новыми параметрами
+ScheduleResult rescheduled = executor.reschedule(request);
 ```
 
 ### Что под капотом
 
-`DefaultEzQuartzScheduleExecutor` на основе `ScheduleRequest`:
+`DefaultCztQuartzScheduleExecutor` на основе `ScheduleRequest`:
 - создаёт `JobDetail` (с описанием, JobDataMap, флагами durability и recovery);
 - создаёт `Trigger` (Cron / Once / Repeat) с применением кастомизаторов;
 - обрабатывает коллизии через `CollisionStrategy` (SKIP, FAIL, REMOVE, REPLACE_AND_RESCHEDULE_IF_EXISTS и др.);
 - вызывает `SchedulerInterceptor` до и после операций.
+
+Помимо `schedule` / `reschedule`, `CztQuartzScheduleExecutor` предоставляет операции управления: `pauseJob` / `resumeJob`, `pauseTrigger` / `resumeTrigger`, `deleteJob`, `jobExists` / `triggerExists`, `getJob` / `getTrigger`.
 
 ### Кастомизация
 
@@ -111,14 +129,14 @@ ScheduleRequest request = ScheduleRequest.builder()
 
 ---
 
-## 2. Декларативное планирование — @EzCronJob
+## 2. Декларативное планирование — @CztCronJob
 
-Аннотация `@EzCronJob` превращает Spring-bean в планируемую задачу. Библиотека автоматически сканирует marked-классы, регистрирует их в job-реестре и планирует при старте приложения.
+Аннотация `@CztCronJob` превращает Spring-bean в планируемую задачу. Библиотека автоматически сканирует аннотированные классы, регистрирует их в job-реестре и планирует при старте приложения. Аннотация мета-аннотирована `@Component`, поэтому класс становится Spring-bean'ом автоматически.
 
 ### Пример
 
 ```java
-@EzCronJob(
+@CztCronJob(
         name = "daily-report",
         group = "reports",
         cron = "0 0 12 * * ?",
@@ -149,9 +167,9 @@ public class DailyReportJob {
 
 ### Как это работает
 
-1. `QuartzBeanPostProcessor` сканирует контекст на bean'ы с `@EzCronJob`.
-2. `EzQuartzJobRegistrar` создаёт `ScheduleRequest` из атрибутов аннотации и планирует задание через `DefaultEzQuartzScheduleExecutor`.
-3. Все аннотированные задания автоматически планируются при старте приложения.
+1. `QuartzBeanPostProcessor` находит bean'ы с `@CztCronJob` и метод с `@Execute`.
+2. `CztQuartzJobRegistrar` регистрирует их, создаёт `ScheduleRequest` из атрибутов аннотации и планирует задания через `DefaultCztQuartzScheduleExecutor`.
+3. `QuartzStartup` запускает планирование всех зарегистрированных заданий после старта контекста; выполнение делегируется в ваш метод через `SpringJobBridge`.
 
 ---
 
@@ -189,26 +207,37 @@ org.quartz.threadPool.threadCount=10
 - **C3P0 DataSource** — создаётся пул соединений на основе параметров из `quartz.properties`.
 - **SchedulerFactoryBean** — конфигурируется с DataSource, транзакциями (PlatformTransactionManager), Spring-интеграцией (AutowiringSpringBeanJobFactory), глобальными слушателями и флагами shutdown.
 - **Spring-интеграция** — `@Autowired` работает внутри `Job.execute()`.
-- **Логирование** — при старте выводится информация о планировщике (имя, ID, job store, thread pool, кластеризация, версия).
+- **Схема БД** — `QuartzSchemaInitializer` проверяет наличие схемы через JDBC-метаданные (`QuartzSchemaDetector`) и при необходимости создаёт её из SQL-скрипта.
+- **Логирование** — при старте выводится информация о планировщике (имя, ID, job store, thread pool, кластеризация, версия). Формат можно переопределить своим bean'ом `BootstrapLogger`.
+
+### Параметры конфигурации
+
+| Свойство | По умолчанию | Описание |
+|----------|--------------|----------|
+| `czt.quartz.config.path` | `quartz.properties` | Путь к файлу конфигурации Quartz в classpath |
+| `ez.quartz.schema.initialize` | `true` | Автоматическая инициализация схемы БД |
+| `ez.quartz.schema.script` | `quartz-init.sql` | Путь к SQL-скрипту схемы в classpath |
+
+Инициализация схемы выполняется только при настроенном JDBC job store и только если схемы ещё нет в БД.
 
 ### Схема БД
 
-Настраивается автоматически 
+Схема создаётся автоматически: `QuartzSchemaDetector` проверяет её наличие по JDBC-метаданным, и если схема отсутствует, `QuartzSchemaInitializer` применяет SQL-скрипт (по умолчанию `quartz-init.sql` в classpath). 
 
 ---
 
 ## 4. Управление шедулерами через REST API
 
-Аннотация `@EnableEzQuartzSchedulerManagement` подключает готовый REST-контроллер (`V1SchedulingManagementController`) для управления заданиями и триггерами в рантайме. Все эндпоинты доступны по базовому пути `/v1/scheduling/management`.
+Аннотация `@EnableCztQuartzSchedulerManagement` подключает готовый REST-контроллер (`InboundManagementController`) для управления заданиями и триггерами в рантайме. Все эндпоинты доступны по базовому пути `/v1/scheduling/management`.
 
 ### Аннотации интеграции
 
 | Аннотация | Что импортирует | Назначение |
 |-----------|-----------------|------------|
-| `@EnableEzQuartzScheduler` | `QuartzConfig` | Автоматическая настройка Quartz, DataSource и планирования |
-| `@EnableEzQuartzSchedulerManagement` | `V1SchedulingManagementController`, `QuartzManagementConfig` | REST API для управления шедулерами |
+| `@EnableCztQuartzScheduler` | `QuartzConfig` | Автоматическая настройка Quartz, DataSource и планирования |
+| `@EnableCztQuartzSchedulerManagement` | `InboundManagementController`, `QuartzManagementConfig`, `SchedulerManagementAdvice` | REST API для управления шедулерами |
 
-`QuartzManagementConfig` регистрирует `InboundSchedulerManager` (адаптер над `Scheduler`) и `SchedulingManagementRestAdapterV1Impl` — слой между REST-контроллером и Quartz. Управление можно включать независимо от планирования: `@EnableEzQuartzSchedulerManagement` работает и без `@EnableEzQuartzScheduler`, если в контексте есть bean `Scheduler`.
+`QuartzManagementConfig` регистрирует `DescriableSchedulerManager` (`DefaultDescriableQuartzAdapter` — адаптер над `Scheduler`), через который REST-контроллер работает с Quartz. Управление можно включать независимо от планирования: `@EnableCztQuartzSchedulerManagement` работает и без `@EnableCztQuartzScheduler`, если в контексте есть bean `Scheduler`.
 
 ### Эндпоинты
 
@@ -257,21 +286,28 @@ PUT /v1/scheduling/management/trigger/stop?id=my-trigger
 {
   "id": "my-trigger",
   "success": true,
-  "message": "Trigger successfully stopped"
+  "message": "stop"
 }
 ```
 
 ### Обработка ошибок
 
-`SchedulerManagementAdvice` маппит контролируемые исключения в корректные HTTP-статусы: `JobNotFound` / `TriggerNotFound` → `404`, остальные ошибки планировщика → `500` (`EzRemoteSchedulerOperationException`).
+`SchedulerManagementAdvice` маппит иерархию sealed-исключений `CztSchedulerManagementException` в корректные HTTP-статусы: `AdapterNotFound` / `JobNotFound` / `TriggerNotFound` → `404`, ошибки операций шедулера (`SchedulerOperation`, `RemoteSchedulerOperation`) → `500`. Тело ответа — `ApiError` с кодом ошибки (`RemoteErrorCode`) и сообщением:
+
+```json
+{
+  "code": "TRIGGER_NOT_FOUND",
+  "message": "Trigger 'my-trigger' not found"
+}
+```
 
 ### Управление удалёнными шедулерами
 
-Модуль `czt-qrtz-management-api` содержит клиентскую часть для управления внешними приложениями с подключённым management-API:
+Модуль `ezqrtz-management-api` содержит клиентскую часть для управления внешними приложениями с подключённым management-API:
 
-- `SchedulingManagementRestAdapterV1` — контракт REST-адаптера (v1);
-- `SchedulerManagementV1RestClientHelper` — построение URL эндпоинтов по `baseUrl`;
-- `SchedulingManagementOutboundAdapterV1` — outbound-адаптер с указанием `adapterId` удалённого шедулера.
+- `OutboundManagementAdapter` — контракт управления удалёнными шедулерами (каждая операция принимает `adapterId`);
+- `SMRestClient` / `DefaultSMRestClient` — REST-клиент: строит URL эндпоинтов по `baseUrl`, HTTP-вызовы делегируются подключаемым transport-провайдерам, поэтому клиент не привязан к конкретному HTTP-стеку;
+- `RemoteSchedulerRegistry` / `RegisteredClientAdapter` / `RemoteSchedulerProps` — реестр зарегистрированных удалённых адаптеров и их параметры (`identity`, `baseUrl`, `friendlyName`).
 
 Это позволяет одному сервису (например, панели администрирования) управлять триггерами нескольких приложений.
 
@@ -280,8 +316,8 @@ PUT /v1/scheduling/management/trigger/stop?id=my-trigger
 | Модуль | Назначение |
 |--------|------------|
 | `ezqrtz-core` | Ядро: DSL `ScheduleRequest`, исполнители, стратегии коллизий |
-| `ezqrtz` | Spring-интеграция: `QuartzConfig`, аннотации `@EnableEzQuartzScheduler` / `@EnableEzQuartzSchedulerManagement`, `@EzCronJob` |
-| `ezqrtz-management-api` | API управления: модели, DTO, REST-контракты, клиентские хелперы |
+| `ezqrtz` | Spring-интеграция: `QuartzConfig`, аннотации `@EnableCztQuartzScheduler` / `@EnableCztQuartzSchedulerManagement`, `@CztCronJob` |
+| `ezqrtz-management-api` | API управления: модели, DTO, REST-контракты, REST-клиент |
 | `ezqrtz-management` | Реализация: REST-контроллер, адаптеры над Quartz, обработка ошибок |
 
 ---
