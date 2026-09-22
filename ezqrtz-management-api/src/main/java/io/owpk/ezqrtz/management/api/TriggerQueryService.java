@@ -3,10 +3,12 @@ package io.owpk.ezqrtz.management.api;
 import io.owpk.ezqrtz.management.api.model.Result;
 import io.owpk.ezqrtz.management.api.model.TriggerDef;
 import io.owpk.ezqrtz.management.api.model.TriggerFilter;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 import java.util.Set;
 
+@NullMarked
 public interface TriggerQueryService {
 
     Set<String> listTriggerGroups();
@@ -15,8 +17,7 @@ public interface TriggerQueryService {
 
     List<TriggerDef> listTriggers(TriggerFilter filter);
 
-    default  List<TriggerDef> listTriggers() {
+    default List<TriggerDef> listTriggers() {
         return listTriggers(TriggerFilter.empty());
     }
-
 }

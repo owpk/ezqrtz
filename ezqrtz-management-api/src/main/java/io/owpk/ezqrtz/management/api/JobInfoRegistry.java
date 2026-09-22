@@ -21,7 +21,7 @@ public class JobInfoRegistry {
 
     public JobInfoRegistry(List<JobDef<Map<String, Class<?>>>> jobDefs) {
         this.registeredJobs = jobDefs.stream().collect(Collectors.toMap(
-                JobDef::getId, Function.identity(),
+                JobDef::id, Function.identity(),
                 (up, _) -> up,
                 ConcurrentHashMap::new));
     }
@@ -31,7 +31,7 @@ public class JobInfoRegistry {
     }
 
     public void registerJob(@NonNull JobDef<Map<String, Class<?>>> jobDef) {
-        registeredJobs.put(jobDef.getId(), jobDef);
+        registeredJobs.put(jobDef.id(), jobDef);
     }
 
     /**

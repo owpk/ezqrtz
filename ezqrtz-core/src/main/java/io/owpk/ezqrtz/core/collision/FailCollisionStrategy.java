@@ -22,5 +22,4 @@ public final class FailCollisionStrategy implements CollisionStrategy {
                 "Job '%s' already exists".formatted(jobKey)
         );
     }
-
 }

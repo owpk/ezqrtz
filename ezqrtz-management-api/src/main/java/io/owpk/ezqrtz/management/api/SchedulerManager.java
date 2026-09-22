@@ -1,7 +1,7 @@
 package io.owpk.ezqrtz.management.api;
 
 /**
- * Интерфейс для управления внутренним шедулером
+ * Интерфейс для управления шедулером
  *
  * @author Vorobyev Vyacheslav
  */

@@ -1,8 +1,7 @@
 /build
 /.idea
-target/
-.flattened-pom.xml
-*/.flattened-pom.xml
+/target
+**/target
 maven-wrapper.jar
 .DS_Store
 .settings/
@@ -12,4 +11,3 @@ bin/
 .classpath
 .factorypath
 /.vscode
-docs/

@@ -1,5 +1,6 @@
 package io.owpk.ezqrtz.core.api;
 
+import org.jspecify.annotations.NullMarked;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 
@@ -8,6 +9,7 @@ import org.quartz.TriggerKey;
  *
  * @author Vyacheslav Vorobev
  */
+@NullMarked
 public interface QuartzTriggerNamesapce {
 
     /**

@@ -1,73 +1,54 @@
 package io.owpk.ezqrtz.management.api.model;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@NullMarked
 public record Result<T>(boolean res,
-                        @Nullable String message,
-                        @Nullable Throwable err,
-                        @NonNull Optional<T> value) {
+                        Optional<CztSchedulerManagementException> err,
+                        Optional<T> value) {
 
-    public static <T> Result<T> success(T value) {
-        return new Result<>(true, null, null, Optional.ofNullable(value));
+    Result(T value) {
+        this(true, Optional.empty(), Optional.of(value));
     }
 
-    public static <T> Result<T> success() {
-        return new Result<>(true, null, null, Optional.empty());
+    Result(CztSchedulerManagementException err) {
+        this(false, Optional.of(err), Optional.empty());
+    }
+
+    public static <T> Result<T> success(T value) {
+        return new Result<>(value);
     }
 
     public static <T> Result<T> failure(String message) {
-        return new Result<>(false, message, null, Optional.empty());
+        return new Result<>(new CztSchedulerManagementException(message));
     }
 
-    public static <T> Result<T> failure(Throwable error) {
-        return new Result<>(false, throwableToMessage(error), error, Optional.empty());
-    }
-
-    private static String throwableToMessage(Throwable error) {
-        if (error.getCause() != null)
-            return error.getMessage() + " -> " + throwableToMessage(error.getCause());
-        return error.getMessage();
+    public static <T> Result<T> failure(CztSchedulerManagementException error) {
+        return new Result<>(error);
     }
 
     public <U> Result<U> map(Function<T, U> mapper) {
         if (!res) return propagateFailure();
         try {
             return value.map(it -> Result.success(mapper.apply(it)))
-                    .orElse(Result.success());
+                    .orElseThrow(this::noValue);
         } catch (Exception e) {
-            return Result.failure(e);
+            return Result.failure(new CztSchedulerManagementException(e));
         }
     }
 
     public <U> Result<U> flatMap(Function<T, Result<U>> mapper) {
         if (!res) return propagateFailure();
         try {
-            return value.map(mapper).orElse(Result.success());
+            return value.map(mapper).orElseThrow(this::noValue);
         } catch (Exception e) {
-            return Result.failure(e);
+            return Result.failure(new CztSchedulerManagementException(e));
         }
-    }
-
-    /**
-     * Пересоздает failure с сохранением исходного {@link #err},
-     * чтобы тип ошибки не терялся при пробросе через map/flatMap.
-     */
-    private <U> Result<U> propagateFailure() {
-        return new Result<>(false, message, err, Optional.empty());
-    }
-
-    public T getOrElse(T defaultValue) {
-        return res ? value.orElse(defaultValue) : defaultValue;
-    }
-
-    public T getOrElseThrow(Function<Throwable, RuntimeException> map) {
-        if (res) return value.orElseThrow();
-        throw map.apply(err != null ? err : new IllegalStateException(message));
     }
 
     public boolean isFailure() {
@@ -83,8 +64,8 @@ public record Result<T>(boolean res,
         return this;
     }
 
-    public Result<T> onFailure(java.util.function.Consumer<String> action) {
-        if (!res) action.accept(message);
+    public Result<T> onFailure(java.util.function.Consumer<? super Throwable> action) {
+        if (!res) err.ifPresent(action);
         return this;
     }
 
@@ -92,11 +73,37 @@ public record Result<T>(boolean res,
         try {
             return Result.success(supplier.get());
         } catch (Exception e) {
-            return Result.failure(e);
+            return Result.failure(new CztSchedulerManagementException(e));
         }
     }
 
-    public String getMessageOr(String unknownError) {
-        return err != null ? err.getMessage() : unknownError;
+    public T getOrElse(T defaultValue) {
+        return res ? value.orElse(defaultValue) : defaultValue;
+    }
+
+    public T getOrElseThrow(Function<CztSchedulerManagementException, RuntimeException> mapFn) {
+        if (res) return value.orElseThrow(this::noValue);
+        throw err.map(mapFn).orElseThrow(this::noValue);
+    }
+
+    public T getOrElseThrow() {
+        if (res) return value.orElseThrow(this::noValue);
+        throw err.orElseGet(() -> new CztSchedulerManagementException(noValue()));
+    }
+
+    public Result<T> mapFailure(Function<CztSchedulerManagementException, T> mapFn) {
+        return res ? this : Result.success(err.map(mapFn).orElseThrow(this::noValue));
+    }
+
+    /**
+     * Пересоздает failure с сохранением исходного {@link #err},
+     * чтобы тип ошибки не терялся при пробросе через map/flatMap.
+     */
+    private <U> Result<U> propagateFailure() {
+        return new Result<>(false, err, Optional.empty());
+    }
+
+    private CztSchedulerManagementException noValue() {
+        return new CztSchedulerManagementException(new IllegalStateException("No value"));
     }
 }

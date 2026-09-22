@@ -24,5 +24,4 @@ public final class RemoveCollisionStrategy implements CollisionStrategy {
         log.debug("Job '{}' was replaced", jobKey);
         return true;
     }
-
 }

@@ -1,10 +1,13 @@
 package io.owpk.ezqrtz.core.api;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Адаптер для общих операций планировщика над заданиями и триггерами.
  *
  * @author Vyacheslav Vorobev
  */
+@NullMarked
 public interface SchedulerManagerAdapter {
 
     /**

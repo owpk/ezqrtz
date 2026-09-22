@@ -2,9 +2,11 @@ package io.owpk.ezqrtz.management.api;
 
 import io.owpk.ezqrtz.management.api.model.TriggerDef;
 import io.owpk.ezqrtz.management.api.model.TriggerFilter;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 
+@NullMarked
 public interface TriggerQueryPaginatedService {
 
     List<TriggerDef> listTriggers(int page, int size, TriggerFilter filter);

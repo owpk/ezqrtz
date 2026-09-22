@@ -10,25 +10,24 @@
     </parent>
 
     <artifactId>ezqrtz-management</artifactId>
-    <name>ezqrtz management</name>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>io.github.owpk</groupId>
-            <artifactId>ezqrtz-management-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.owpk</groupId>
+            <artifactId>ezqrtz-management-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

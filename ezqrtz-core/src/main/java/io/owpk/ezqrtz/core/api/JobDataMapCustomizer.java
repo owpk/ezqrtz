@@ -1,5 +1,6 @@
 package io.owpk.ezqrtz.core.api;
 
+import org.jspecify.annotations.NullMarked;
 import org.quartz.JobDataMap;
 
 /**
@@ -8,6 +9,7 @@ import org.quartz.JobDataMap;
  * @author Vyacheslav Vorobev
  */
 @FunctionalInterface
+@NullMarked
 public interface JobDataMapCustomizer {
 
     /**

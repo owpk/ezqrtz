@@ -23,5 +23,4 @@ public record SchedulerNamespace(
     public TriggerKey triggerKey(String identity) {
         return new TriggerKey(identity, triggerGroup);
     }
-
 }
