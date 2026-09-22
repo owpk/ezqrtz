@@ -8,17 +8,31 @@
 #   ./maven-publish.sh patch        # non-interactive: patch|minor|major
 #   ./maven-publish.sh patch --no-commit
 #                                   # bump & deploy without git commit/tag
+#   ./maven-publish.sh --no-tag
+#                                   # deploy the CURRENT version as-is:
+#                                   # no version bump, no git commit/tag
 #
 set -euo pipefail
 
 POM="pom.xml"
 REVISION_PROPERTY="revision"
 SKIP_GIT=false
-BUMP_KIND="${1:-}"
+SKIP_BUMP=false
+BUMP_KIND=""
 
-if [[ "${2:-}" == "--no-commit" ]]; then
-  SKIP_GIT=true
-fi
+for arg in "$@"; do
+  case "$arg" in
+  patch | minor | major) BUMP_KIND="$arg" ;;
+  --no-commit) SKIP_GIT=true ;;
+  --no-tag)
+    SKIP_BUMP=true
+    SKIP_GIT=true
+    ;;
+  *)
+    die "Unknown argument: '$arg' (expected major|minor|patch, --no-commit, --no-tag)"
+    ;;
+  esac
+done
 
 # ---------------------------------------------------------------------------
 # Helpers
