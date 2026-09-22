@@ -20,20 +20,6 @@ SKIP_GIT=false
 SKIP_BUMP=false
 BUMP_KIND=""
 
-for arg in "$@"; do
-  case "$arg" in
-  patch | minor | major) BUMP_KIND="$arg" ;;
-  --no-commit) SKIP_GIT=true ;;
-  --no-tag)
-    SKIP_BUMP=true
-    SKIP_GIT=true
-    ;;
-  *)
-    die "Unknown argument: '$arg' (expected major|minor|patch, --no-commit, --no-tag)"
-    ;;
-  esac
-done
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -73,6 +59,24 @@ bump_version() {
 }
 
 # ---------------------------------------------------------------------------
+# Arguments
+# ---------------------------------------------------------------------------
+
+for arg in "$@"; do
+  case "$arg" in
+  patch | minor | major) BUMP_KIND="$arg" ;;
+  --no-commit) SKIP_GIT=true ;;
+  --no-tag)
+    SKIP_BUMP=true
+    SKIP_GIT=true
+    ;;
+  *)
+    die "Unknown argument: '$arg' (expected major|minor|patch, --no-commit, --no-tag)"
+    ;;
+  esac
+done
+
+# ---------------------------------------------------------------------------
 # Preconditions
 # ---------------------------------------------------------------------------
 
@@ -96,31 +100,40 @@ fi
 
 CURRENT="$(current_version)"
 
-if [[ -z "$BUMP_KIND" ]]; then
-  echo "Current version: $CURRENT"
+if [[ "$SKIP_BUMP" == true ]]; then
+  [[ -z "$BUMP_KIND" ]] || die "--no-tag cannot be combined with a bump kind ('$BUMP_KIND')"
+  NEW_VERSION="$CURRENT"
   echo
-  echo "Which part to bump?"
-  select BUMP_KIND in major minor patch; do
-    [[ -n "$BUMP_KIND" ]] && break
-  done
+  echo "Version bump skipped (--no-tag), deploying current version $CURRENT"
+  read -r -p "Continue? [y/N] " confirm
+  [[ "$confirm" == "y" || "$confirm" == "Y" ]] || die "Aborted by user"
+else
+  if [[ -z "$BUMP_KIND" ]]; then
+    echo "Current version: $CURRENT"
+    echo
+    echo "Which part to bump?"
+    select BUMP_KIND in major minor patch; do
+      [[ -n "$BUMP_KIND" ]] && break
+    done
+  fi
+
+  NEW_VERSION="$(bump_version "$CURRENT" "$BUMP_KIND")"
+
+  echo
+  echo "Version: $CURRENT -> $NEW_VERSION"
+  read -r -p "Continue? [y/N] " confirm
+  [[ "$confirm" == "y" || "$confirm" == "Y" ]] || die "Aborted by user"
+
+  sed -i.bak "s|<${REVISION_PROPERTY}>${CURRENT}</${REVISION_PROPERTY}>|<${REVISION_PROPERTY}>${NEW_VERSION}</${REVISION_PROPERTY}>|" "$POM"
+  rm -f "$POM.bak"
+
+  # Sanity check: the property must be updated in exactly one place
+  UPDATED="$(current_version)"
+  [[ "$UPDATED" == "$NEW_VERSION" ]] || die "Failed to update version in $POM (still $UPDATED)"
+  grep -q "<${REVISION_PROPERTY}>${NEW_VERSION}</${REVISION_PROPERTY}>" "$POM" || die "Version replacement failed"
+
+  echo "Version updated in $POM"
 fi
-
-NEW_VERSION="$(bump_version "$CURRENT" "$BUMP_KIND")"
-
-echo
-echo "Version: $CURRENT -> $NEW_VERSION"
-read -r -p "Continue? [y/N] " confirm
-[[ "$confirm" == "y" || "$confirm" == "Y" ]] || die "Aborted by user"
-
-sed -i.bak "s|<${REVISION_PROPERTY}>${CURRENT}</${REVISION_PROPERTY}>|<${REVISION_PROPERTY}>${NEW_VERSION}</${REVISION_PROPERTY}>|" "$POM"
-rm -f "$POM.bak"
-
-# Sanity check: the property must be updated in exactly one place
-UPDATED="$(current_version)"
-[[ "$UPDATED" == "$NEW_VERSION" ]] || die "Failed to update version in $POM (still $UPDATED)"
-grep -q "<${REVISION_PROPERTY}>${NEW_VERSION}</${REVISION_PROPERTY}>" "$POM" || die "Version replacement failed"
-
-echo "Version updated in $POM"
 
 # ---------------------------------------------------------------------------
 # Commit + tag
@@ -135,7 +148,8 @@ fi
 # Deploy
 # ---------------------------------------------------------------------------
 
-export GPG_TTY=$(tty)
+GPG_TTY=$(tty)
+export GPG_TTY
 
 gpgconf --kill gpg-agent
 gpgconf --launch gpg-agent
@@ -152,6 +166,9 @@ if [[ "$SKIP_GIT" == false ]]; then
   echo
   echo "Tag v${NEW_VERSION} created."
   echo "Done! Do not forget to push: git push && git push --tags"
+elif [[ "$SKIP_BUMP" == true ]]; then
+  echo
+  echo "Done! Deployed v${NEW_VERSION} without version bump."
 else
   echo
   echo "Done! Remember to commit the version bump in $POM."
