@@ -34,8 +34,10 @@ public record ScheduleRequest(
             durable = true;
         if (Objects.isNull(jobClass))
             throw new IllegalStateException("Job class should not be null");
-        if (Objects.isNull(jobIdentity) || Objects.isNull(triggerIdentity))
-            throw new IllegalStateException("Job identity or trigger identity should not be null");
+        if (Objects.isNull(triggerIdentity))
+            throw new IllegalStateException("Trigger identity should not be null");
+        if (Objects.isNull(jobIdentity))
+            jobIdentity = triggerIdentity;
         if (Objects.isNull(collisionStrategy))
             collisionStrategy = CollisionStrategyType.REPLACE_AND_RESCHEDULE_IF_EXISTS.getStrategy();
         if (Objects.isNull(jobDataCustomizer))
