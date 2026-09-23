@@ -1,6 +1,6 @@
 package io.owpk.ezqrtz.core.api;
 
-import io.owpk.ezqrtz.core.exception.CztSchedulingException;
+import io.owpk.ezqrtz.core.exception.EzSchedulingException;
 import io.owpk.ezqrtz.core.exception.JobNotFound;
 import io.owpk.ezqrtz.core.exception.TriggerNotFound;
 import io.owpk.ezqrtz.core.model.ScheduleRequest;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  * @author Vyacheslav Vorobev
  */
 @NullMarked
-public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequest> {
+public interface EzQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequest> {
 
     /**
      * Возвращает базовый планировщик Quartz.
@@ -35,7 +35,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @return true, если успешно поставлено на паузу, false в противном случае
      */
-    boolean pauseJob(String identity) throws CztSchedulingException;
+    boolean pauseJob(String identity) throws EzSchedulingException;
 
     /**
      * Ставит на паузу триггер с указанным идентификатором.
@@ -43,7 +43,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор триггера
      * @return true, если успешно поставлено на паузу, false в противном случае
      */
-    boolean pauseTrigger(String identity) throws CztSchedulingException;
+    boolean pauseTrigger(String identity) throws EzSchedulingException;
 
     /**
      * Снимает с паузы задание с указанным идентификатором.
@@ -51,7 +51,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @return true, если успешно снято с паузы, false в противном случае
      */
-    boolean resumeJob(String identity) throws CztSchedulingException;
+    boolean resumeJob(String identity) throws EzSchedulingException;
 
     /**
      * Снимает с паузы триггер с указанным идентификатором.
@@ -59,7 +59,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор триггера
      * @return true, если успешно снято с паузы, false в противном случае
      */
-    boolean resumeTrigger(String identity) throws CztSchedulingException;
+    boolean resumeTrigger(String identity) throws EzSchedulingException;
 
     /**
      * Удаляет задание с указанным идентификатором.
@@ -67,7 +67,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @return true, если успешно удалено, false в противном случае
      */
-    boolean deleteJob(String identity) throws CztSchedulingException;
+    boolean deleteJob(String identity) throws EzSchedulingException;
 
     /**
      * Проверяет, существует ли задание с указанным идентификатором.
@@ -91,7 +91,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @param onError  колбэк, вызываемый при ошибке
      */
-    void pauseJob(String identity, Consumer<CztSchedulingException> onError);
+    void pauseJob(String identity, Consumer<EzSchedulingException> onError);
 
     /**
      * Ставит на паузу триггер с указанным идентификатором, обрабатывая ошибки через колбэк.
@@ -99,7 +99,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор триггера
      * @param onError  колбэк, вызываемый при ошибке
      */
-    void pauseTrigger(String identity, Consumer<CztSchedulingException> onError);
+    void pauseTrigger(String identity, Consumer<EzSchedulingException> onError);
 
     /**
      * Снимает с паузы задание с указанным идентификатором, обрабатывая ошибки через колбэк.
@@ -107,7 +107,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @param onError  колбэк, вызываемый при ошибке
      */
-    void resumeJob(String identity, Consumer<CztSchedulingException> onError);
+    void resumeJob(String identity, Consumer<EzSchedulingException> onError);
 
     /**
      * Снимает с паузы триггер с указанным идентификатором, обрабатывая ошибки через колбэк.
@@ -115,7 +115,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор триггера
      * @param onError  колбэк, вызываемый при ошибке
      */
-    void resumeTrigger(String identity, Consumer<CztSchedulingException> onError);
+    void resumeTrigger(String identity, Consumer<EzSchedulingException> onError);
 
     /**
      * Удаляет задание с указанным идентификатором, обрабатывая ошибки через колбэк.
@@ -123,7 +123,7 @@ public interface CztQuartzScheduleExecutor extends ScheduleExecutor<ScheduleRequ
      * @param identity идентификатор задания
      * @param onError  колбэк, вызываемый при ошибке
      */
-    void deleteJob(String identity, Consumer<CztSchedulingException> onError);
+    void deleteJob(String identity, Consumer<EzSchedulingException> onError);
 
     /**
      * Возвращает триггер с указанным идентификатором.

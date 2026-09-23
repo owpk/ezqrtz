@@ -2,7 +2,7 @@ package io.opwk.ezqrtz.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import io.owpk.ezqrtz.core.api.SchedulerInterceptor;
-import io.opwk.ezqrtz.CztQuartzJobRegistrar;
+import io.opwk.ezqrtz.EzQuartzJobRegistrar;
 import io.opwk.ezqrtz.QuartzBeanPostProcessor;
 import io.opwk.ezqrtz.QuartzStartup;
 import lombok.RequiredArgsConstructor;
@@ -44,21 +44,21 @@ public class QuartzConfig {
 
     private final Environment environment;
 
-    @Value("${czt.quartz.config.path:quartz.properties}")
+    @Value("${ez.quartz.config.path:quartz.properties}")
     private String quartzConfigPath;
 
     @Bean
-    CztQuartzJobRegistrar jobRegistrar(Scheduler sfb, List<SchedulerInterceptor> interceptors) {
-        return new CztQuartzJobRegistrar(sfb, interceptors);
+    EzQuartzJobRegistrar jobRegistrar(Scheduler sfb, List<SchedulerInterceptor> interceptors) {
+        return new EzQuartzJobRegistrar(sfb, interceptors);
     }
 
     @Bean
-    static QuartzBeanPostProcessor quartzBeanPostProcessor(ObjectProvider<CztQuartzJobRegistrar> registrar) {
+    static QuartzBeanPostProcessor quartzBeanPostProcessor(ObjectProvider<EzQuartzJobRegistrar> registrar) {
         return new QuartzBeanPostProcessor(registrar);
     }
 
     @Bean
-    QuartzStartup quartzStartup(CztQuartzJobRegistrar registrar) {
+    QuartzStartup quartzStartup(EzQuartzJobRegistrar registrar) {
         return new QuartzStartup(registrar);
     }
 
@@ -176,8 +176,16 @@ public class QuartzConfig {
     @ConditionalOnMissingBean
     BootstrapLogger defaultBootstrapLogger() {
         return logFmt -> log.info("""
+                                                         ██
+                                         ████           ░██
+                          █████  ██████ ██░░██  ██████ ██████ ██████
+                         ██░░░██░░░░██ ░██ ░██ ░░██░░█░░░██░ ░░░░██
+                        ░███████   ██  ░░█████  ░██ ░   ░██     ██
+                        ░██░░░░   ██    ░░░░██  ░██     ░██    ██
+                        ░░██████ ██████    ░███░███     ░░██  ██████
+                         ░░░░░░ ░░░░░░     ░░░ ░░░       ░░  ░░░░░░
                         
-                        ── czt-qrtz :: quartz scheduler ───────────────────────
+                        ── ez-qrtz :: quartz scheduler ───────────────────────
                           Scheduler Name           {}
                           Instance ID              {}
                           Scheduler Class          {}

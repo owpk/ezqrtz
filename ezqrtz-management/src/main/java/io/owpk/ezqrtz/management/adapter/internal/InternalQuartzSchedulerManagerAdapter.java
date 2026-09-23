@@ -1,7 +1,7 @@
 package io.owpk.ezqrtz.management.adapter.internal;
 
 import io.owpk.ezqrtz.management.api.SchedulerManager;
-import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import io.owpk.ezqrtz.management.api.ex.EzSchedulerManagementException;
 import io.owpk.ezqrtz.management.api.ex.JobNotFound;
 import io.owpk.ezqrtz.management.api.ex.SchedulerOperation;
 import io.owpk.ezqrtz.management.api.ex.TriggerNotFound;
@@ -392,10 +392,10 @@ public abstract class InternalQuartzSchedulerManagerAdapter implements Scheduler
                 .map(Result::success)
                 .getOrElseGet(e -> {
                     if (e instanceof SchedulerException se)
-                        return Result.failure(new CztSchedulerManagementException(se));
-                    if (e instanceof CztSchedulerManagementException ce)
+                        return Result.failure(new EzSchedulerManagementException(se));
+                    if (e instanceof EzSchedulerManagementException ce)
                         return Result.failure(ce);
-                    return Result.failure(new CztSchedulerManagementException(e));
+                    return Result.failure(new EzSchedulerManagementException(e));
                 });
     }
 }

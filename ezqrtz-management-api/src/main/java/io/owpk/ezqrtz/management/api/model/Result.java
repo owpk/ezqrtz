@@ -1,6 +1,6 @@
 package io.owpk.ezqrtz.management.api.model;
 
-import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import io.owpk.ezqrtz.management.api.ex.EzSchedulerManagementException;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
@@ -9,14 +9,14 @@ import java.util.function.Supplier;
 
 @NullMarked
 public record Result<T>(boolean res,
-                        Optional<CztSchedulerManagementException> err,
+                        Optional<EzSchedulerManagementException> err,
                         Optional<T> value) {
 
     Result(T value) {
         this(true, Optional.empty(), Optional.of(value));
     }
 
-    Result(CztSchedulerManagementException err) {
+    Result(EzSchedulerManagementException err) {
         this(false, Optional.of(err), Optional.empty());
     }
 
@@ -25,10 +25,10 @@ public record Result<T>(boolean res,
     }
 
     public static <T> Result<T> failure(String message) {
-        return new Result<>(new CztSchedulerManagementException(message));
+        return new Result<>(new EzSchedulerManagementException(message));
     }
 
-    public static <T> Result<T> failure(CztSchedulerManagementException error) {
+    public static <T> Result<T> failure(EzSchedulerManagementException error) {
         return new Result<>(error);
     }
 
@@ -38,7 +38,7 @@ public record Result<T>(boolean res,
             return value.map(it -> Result.success(mapper.apply(it)))
                     .orElseThrow(this::noValue);
         } catch (Exception e) {
-            return Result.failure(new CztSchedulerManagementException(e));
+            return Result.failure(new EzSchedulerManagementException(e));
         }
     }
 
@@ -47,7 +47,7 @@ public record Result<T>(boolean res,
         try {
             return value.map(mapper).orElseThrow(this::noValue);
         } catch (Exception e) {
-            return Result.failure(new CztSchedulerManagementException(e));
+            return Result.failure(new EzSchedulerManagementException(e));
         }
     }
 
@@ -73,7 +73,7 @@ public record Result<T>(boolean res,
         try {
             return Result.success(supplier.get());
         } catch (Exception e) {
-            return Result.failure(new CztSchedulerManagementException(e));
+            return Result.failure(new EzSchedulerManagementException(e));
         }
     }
 
@@ -81,17 +81,17 @@ public record Result<T>(boolean res,
         return res ? value.orElse(defaultValue) : defaultValue;
     }
 
-    public T getOrElseThrow(Function<CztSchedulerManagementException, RuntimeException> mapFn) {
+    public T getOrElseThrow(Function<EzSchedulerManagementException, RuntimeException> mapFn) {
         if (res) return value.orElseThrow(this::noValue);
         throw err.map(mapFn).orElseThrow(this::noValue);
     }
 
     public T getOrElseThrow() {
         if (res) return value.orElseThrow(this::noValue);
-        throw err.orElseGet(() -> new CztSchedulerManagementException(noValue()));
+        throw err.orElseGet(() -> new EzSchedulerManagementException(noValue()));
     }
 
-    public Result<T> mapFailure(Function<CztSchedulerManagementException, T> mapFn) {
+    public Result<T> mapFailure(Function<EzSchedulerManagementException, T> mapFn) {
         return res ? this : Result.success(err.map(mapFn).orElseThrow(this::noValue));
     }
 
@@ -103,7 +103,7 @@ public record Result<T>(boolean res,
         return new Result<>(false, err, Optional.empty());
     }
 
-    private CztSchedulerManagementException noValue() {
-        return new CztSchedulerManagementException(new IllegalStateException("No value"));
+    private EzSchedulerManagementException noValue() {
+        return new EzSchedulerManagementException(new IllegalStateException("No value"));
     }
 }

@@ -11,9 +11,9 @@ Spring library for convenient work with the **Quartz Scheduler**. It provides a 
 The library addresses four typical Quartz pain points:
 
 1. **Complexity of creating jobs and triggers** — instead of long builder chains, a single `ScheduleRequest` is enough.
-2. **Manual bean registration and maintenance** — the `@CztCronJob` annotation automatically scans, registers, and schedules jobs at application startup.
+2. **Manual bean registration and maintenance** — the `@EzCronJob` annotation automatically scans, registers, and schedules jobs at application startup.
 3. **Persistent store configuration** — `QuartzConfig` automatically creates a DataSource based on `quartz.properties`, configures the C3P0 pool, transactions, and Spring integration.
-4. **Runtime job management** — the REST API (`@EnableCztQuartzSchedulerManagement`) allows viewing, creating, updating, starting, and stopping triggers without restarting the application.
+4. **Runtime job management** — the REST API (`@EnableEzQuartzSchedulerManagement`) allows viewing, creating, updating, starting, and stopping triggers without restarting the application.
 
 ## Installation
 
@@ -39,19 +39,19 @@ Individual modules (`ezqrtz-core`, `ezqrtz-management-api`, `ezqrtz-management`)
 
 ## Quick Start
 
-Add `@EnableCztQuartzScheduler` to a configuration class — this is enough for scheduling:
+Add `@EnableEzQuartzScheduler` to a configuration class — this is enough for scheduling:
 
 ```java
-@EnableCztQuartzScheduler
+@EnableEzQuartzScheduler
 @Configuration
 public class AppConfig { }
 ```
 
-To additionally enable scheduler management via the REST API, add `@EnableCztQuartzSchedulerManagement`:
+To additionally enable scheduler management via the REST API, add `@EnableEzQuartzSchedulerManagement`:
 
 ```java
-@EnableCztQuartzScheduler
-@EnableCztQuartzSchedulerManagement
+@EnableEzQuartzScheduler
+@EnableEzQuartzSchedulerManagement
 @Configuration
 public class AppConfig { }
 ```
@@ -62,16 +62,16 @@ Provide a `quartz.properties` file on the classpath with DataSource configuratio
 
 ## 1. Programmatic Scheduling — ScheduleRequest DSL
 
-`ScheduleRequest` is a builder object that encapsulates the entire job and trigger configuration. Pass it to a `CztQuartzScheduleExecutor` — and the library will create the job, the trigger, and schedule the execution.
+`ScheduleRequest` is a builder object that encapsulates the entire job and trigger configuration. Pass it to a `EzQuartzScheduleExecutor` — and the library will create the job, the trigger, and schedule the execution.
 
 ### Wiring the Executor
 
-The library does not register the executor automatically — create a `CztQuartzScheduleExecutor` bean based on `DefaultCztQuartzScheduleExecutor`:
+The library does not register the executor automatically — create a `EzQuartzScheduleExecutor` bean based on `DefaultEzQuartzScheduleExecutor`:
 
 ```java
 @Bean
-public CztQuartzScheduleExecutor scheduleExecutor(Scheduler scheduler) {
-    return new DefaultCztQuartzScheduleExecutor(scheduler, List.of());
+public EzQuartzScheduleExecutor scheduleExecutor(Scheduler scheduler) {
+    return new DefaultEzQuartzScheduleExecutor(scheduler, List.of());
 }
 ```
 
@@ -81,7 +81,7 @@ Optionally, a Quartz group namespace (`SchedulerNamespace`) can be provided to i
 
 ```java
 @Autowired
-private CztQuartzScheduleExecutor executor;
+private EzQuartzScheduleExecutor executor;
 
 ScheduleRequest request = ScheduleRequest.builder()
         .jobClass(MyJob.class)
@@ -102,13 +102,13 @@ ScheduleResult rescheduled = executor.reschedule(request);
 
 ### Under the Hood
 
-`DefaultCztQuartzScheduleExecutor`, based on `ScheduleRequest`:
+`DefaultEzQuartzScheduleExecutor`, based on `ScheduleRequest`:
 - creates a `JobDetail` (with description, JobDataMap, durability and recovery flags);
 - creates a `Trigger` (Cron / Once / Repeat) with customizers applied;
 - handles collisions via `CollisionStrategy` (SKIP, FAIL, REMOVE, REPLACE_AND_RESCHEDULE_IF_EXISTS, etc.);
 - invokes `SchedulerInterceptor` before and after operations.
 
-Besides `schedule` / `reschedule`, `CztQuartzScheduleExecutor` provides management operations: `pauseJob` / `resumeJob`, `pauseTrigger` / `resumeTrigger`, `deleteJob`, `jobExists` / `triggerExists`, `getJob` / `getTrigger`.
+Besides `schedule` / `reschedule`, `EzQuartzScheduleExecutor` provides management operations: `pauseJob` / `resumeJob`, `pauseTrigger` / `resumeTrigger`, `deleteJob`, `jobExists` / `triggerExists`, `getJob` / `getTrigger`.
 
 ### Customization
 
@@ -129,14 +129,14 @@ ScheduleRequest request = ScheduleRequest.builder()
 
 ---
 
-## 2. Declarative Scheduling — @CztCronJob
+## 2. Declarative Scheduling — @EzCronJob
 
-The `@CztCronJob` annotation turns a Spring bean into a schedulable task. The library automatically scans annotated classes, registers them in the job registry, and schedules them at application startup. The annotation is meta-annotated with `@Component`, so the class becomes a Spring bean automatically.
+The `@EzCronJob` annotation turns a Spring bean into a schedulable task. The library automatically scans annotated classes, registers them in the job registry, and schedules them at application startup. The annotation is meta-annotated with `@Component`, so the class becomes a Spring bean automatically.
 
 ### Example
 
 ```java
-@CztCronJob(
+@EzCronJob(
         name = "daily-report",
         group = "reports",
         cron = "0 0 12 * * ?",
@@ -167,8 +167,8 @@ public class DailyReportJob {
 
 ### How It Works
 
-1. `QuartzBeanPostProcessor` finds beans annotated with `@CztCronJob` and their `@Execute` method.
-2. `CztQuartzJobRegistrar` registers them, builds a `ScheduleRequest` from the annotation attributes, and schedules the jobs via `DefaultCztQuartzScheduleExecutor`.
+1. `QuartzBeanPostProcessor` finds beans annotated with `@EzCronJob` and their `@Execute` method.
+2. `EzQuartzJobRegistrar` registers them, builds a `ScheduleRequest` from the annotation attributes, and schedules the jobs via `DefaultEzQuartzScheduleExecutor`.
 3. `QuartzStartup` schedules all registered jobs once the context is up; execution is delegated to your method via `SpringJobBridge`.
 
 ---
@@ -214,7 +214,7 @@ org.quartz.threadPool.threadCount=10
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `czt.quartz.config.path` | `quartz.properties` | Path to the Quartz configuration file on the classpath |
+| `ez.quartz.config.path` | `quartz.properties` | Path to the Quartz configuration file on the classpath |
 | `ez.quartz.schema.initialize` | `true` | Automatic database schema initialization |
 | `ez.quartz.schema.script` | `quartz-init.sql` | Path to the schema SQL script on the classpath |
 
@@ -228,16 +228,16 @@ The schema is created automatically: `QuartzSchemaDetector` checks its presence 
 
 ## 4. Scheduler Management via REST API
 
-The `@EnableCztQuartzSchedulerManagement` annotation wires in a ready-to-use REST controller (`InboundManagementController`) for managing jobs and triggers at runtime. All endpoints are available under the base path `/v1/scheduling/management`.
+The `@EnableEzQuartzSchedulerManagement` annotation wires in a ready-to-use REST controller (`InboundManagementController`) for managing jobs and triggers at runtime. All endpoints are available under the base path `/v1/scheduling/management`.
 
 ### Integration Annotations
 
 | Annotation | What It Imports | Purpose |
 |------------|-----------------|---------|
-| `@EnableCztQuartzScheduler` | `QuartzConfig` | Automatic configuration of Quartz, DataSource, and scheduling |
-| `@EnableCztQuartzSchedulerManagement` | `InboundManagementController`, `QuartzManagementConfig`, `SchedulerManagementAdvice` | REST API for scheduler management |
+| `@EnableEzQuartzScheduler` | `QuartzConfig` | Automatic configuration of Quartz, DataSource, and scheduling |
+| `@EnableEzQuartzSchedulerManagement` | `InboundManagementController`, `QuartzManagementConfig`, `SchedulerManagementAdvice` | REST API for scheduler management |
 
-`QuartzManagementConfig` registers a `DescriableSchedulerManager` (`DefaultDescriableQuartzAdapter` — an adapter over `Scheduler`) through which the REST controller talks to Quartz. Management can be enabled independently of scheduling: `@EnableCztQuartzSchedulerManagement` works without `@EnableCztQuartzScheduler` as long as a `Scheduler` bean exists in the context.
+`QuartzManagementConfig` registers a `DescriableSchedulerManager` (`DefaultDescriableQuartzAdapter` — an adapter over `Scheduler`) through which the REST controller talks to Quartz. Management can be enabled independently of scheduling: `@EnableEzQuartzSchedulerManagement` works without `@EnableEzQuartzScheduler` as long as a `Scheduler` bean exists in the context.
 
 ### Endpoints
 
@@ -292,7 +292,7 @@ Response of modification operations (`TriggerModifiedResult`):
 
 ### Error Handling
 
-`SchedulerManagementAdvice` maps the sealed `CztSchedulerManagementException` hierarchy to appropriate HTTP statuses: `AdapterNotFound` / `JobNotFound` / `TriggerNotFound` → `404`, scheduler operation errors (`SchedulerOperation`, `RemoteSchedulerOperation`) → `500`. The response body is an `ApiError` with an error code (`RemoteErrorCode`) and a message:
+`SchedulerManagementAdvice` maps the sealed `EzSchedulerManagementException` hierarchy to appropriate HTTP statuses: `AdapterNotFound` / `JobNotFound` / `TriggerNotFound` → `404`, scheduler operation errors (`SchedulerOperation`, `RemoteSchedulerOperation`) → `500`. The response body is an `ApiError` with an error code (`RemoteErrorCode`) and a message:
 
 ```json
 {
@@ -306,8 +306,8 @@ Response of modification operations (`TriggerModifiedResult`):
 The `ezqrtz-management-api` module contains the client-side part for managing external applications with the management API connected:
 
 - `OutboundManagementAdapter` — contract for managing remote schedulers (each operation takes an `adapterId`);
-- `SMRestClient` / `DefaultSMRestClient` — REST client: builds endpoint URLs from `baseUrl`, HTTP calls are delegated to pluggable transport providers, so the client is not tied to a specific HTTP stack;
-- `RemoteSchedulerRegistry` / `RegisteredClientAdapter` / `RemoteSchedulerProps` — registry of registered remote adapters and their properties (`identity`, `baseUrl`, `friendlyName`).
+- `EzSMRestClient` / `DefaultEzSMRestClient` — REST client: builds endpoint URLs from `baseUrl`, HTTP calls are delegated to pluggable transport providers, so the client is not tied to a specific HTTP stack;
+- `RemoteSchedulerRegistry` / `RegisteredClientAdapterEz` / `RemoteSchedulerProps` — registry of registered remote adapters and their properties (`identity`, `baseUrl`, `friendlyName`).
 
 This allows a single service (for example, an admin panel) to manage triggers of multiple applications.
 
@@ -316,7 +316,7 @@ This allows a single service (for example, an admin panel) to manage triggers of
 | Module | Purpose |
 |--------|---------|
 | `ezqrtz-core` | Core: `ScheduleRequest` DSL, executors, collision strategies |
-| `ezqrtz` | Spring integration: `QuartzConfig`, `@EnableCztQuartzScheduler` / `@EnableCztQuartzSchedulerManagement` annotations, `@CztCronJob` |
+| `ezqrtz` | Spring integration: `QuartzConfig`, `@EnableEzQuartzScheduler` / `@EnableEzQuartzSchedulerManagement` annotations, `@EzCronJob` |
 | `ezqrtz-management-api` | Management API: models, DTOs, REST contracts, REST client |
 | `ezqrtz-management` | Implementation: REST controller, Quartz adapters, error handling |
 

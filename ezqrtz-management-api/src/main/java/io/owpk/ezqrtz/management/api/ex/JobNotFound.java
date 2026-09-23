@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.function.Supplier;
 
 @NullMarked
-public final class JobNotFound extends CztSchedulerManagementException {
+public final class JobNotFound extends EzSchedulerManagementException {
     public JobNotFound(String jobId) {
         super("Job not found: " + jobId);
     }

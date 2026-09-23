@@ -3,7 +3,7 @@ package io.owpk.ezqrtz.management.api.ex;
 /**
  * Базовое исключение управления шедулерами.
  */
-public sealed class CztSchedulerManagementException extends RuntimeException
+public sealed class EzSchedulerManagementException extends RuntimeException
         permits
         AdapterNotFound,
         SchedulerOperation,
@@ -11,11 +11,11 @@ public sealed class CztSchedulerManagementException extends RuntimeException
         JobNotFound,
         TriggerNotFound {
 
-    public CztSchedulerManagementException(String message) {
+    public EzSchedulerManagementException(String message) {
         super(message);
     }
 
-    public CztSchedulerManagementException(Throwable e) {
+    public EzSchedulerManagementException(Throwable e) {
         super(e);
     }
 }

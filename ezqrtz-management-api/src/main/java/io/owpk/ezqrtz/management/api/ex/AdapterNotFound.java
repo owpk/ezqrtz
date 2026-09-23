@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.function.Supplier;
 
 @NullMarked
-public final class AdapterNotFound extends CztSchedulerManagementException {
+public final class AdapterNotFound extends EzSchedulerManagementException {
 
     public AdapterNotFound(String adapterId) {
         super("Adapter with id '" + adapterId + "' not found");

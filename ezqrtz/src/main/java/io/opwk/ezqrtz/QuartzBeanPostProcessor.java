@@ -1,6 +1,6 @@
 package io.opwk.ezqrtz;
 
-import io.owpk.ezqrtz.core.annotations.CztCronJob;
+import io.owpk.ezqrtz.core.annotations.EzCronJob;
 import io.owpk.ezqrtz.core.annotations.Execute;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.aop.support.AopUtils;
@@ -16,16 +16,16 @@ import java.util.Arrays;
 
 @NullMarked
 public class QuartzBeanPostProcessor implements BeanPostProcessor {
-    private final ObjectProvider<CztQuartzJobRegistrar> registrar;
+    private final ObjectProvider<EzQuartzJobRegistrar> registrar;
 
-    public QuartzBeanPostProcessor(ObjectProvider<CztQuartzJobRegistrar> registrarProvider) {
+    public QuartzBeanPostProcessor(ObjectProvider<EzQuartzJobRegistrar> registrarProvider) {
         this.registrar = registrarProvider;
     }
 
-    public QuartzBeanPostProcessor(CztQuartzJobRegistrar registrar) {
+    public QuartzBeanPostProcessor(EzQuartzJobRegistrar registrar) {
         this(new ObjectProvider<>() {
             @Override
-            public CztQuartzJobRegistrar getObject() {
+            public EzQuartzJobRegistrar getObject() {
                 return registrar;
             }
         });
@@ -36,11 +36,11 @@ public class QuartzBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanClass = AopUtils.getTargetClass(bean);
 
-        CztCronJob cztQuartzJob = AnnotationUtils.findAnnotation(
+        EzCronJob ezQuartzJob = AnnotationUtils.findAnnotation(
                 bean.getClass(),
-                CztCronJob.class);
+                EzCronJob.class);
 
-        if (cztQuartzJob == null)
+        if (ezQuartzJob == null)
             return bean;
 
         Method method = Arrays.stream(beanClass.getDeclaredMethods())
@@ -52,7 +52,7 @@ public class QuartzBeanPostProcessor implements BeanPostProcessor {
             MethodHandle methodHandle = MethodHandles.lookup()
                     .unreflect(method)
                     .bindTo(bean);
-            registrar.getObject().register(bean, cztQuartzJob, methodHandle);
+            registrar.getObject().register(bean, ezQuartzJob, methodHandle);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

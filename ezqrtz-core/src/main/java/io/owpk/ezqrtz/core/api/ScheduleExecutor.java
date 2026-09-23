@@ -1,6 +1,6 @@
 package io.owpk.ezqrtz.core.api;
 
-import io.owpk.ezqrtz.core.exception.CztSchedulingException;
+import io.owpk.ezqrtz.core.exception.EzSchedulingException;
 import io.owpk.ezqrtz.core.model.ScheduleResult;
 import org.jspecify.annotations.NullMarked;
 
@@ -19,7 +19,7 @@ public interface ScheduleExecutor<T> {
      * @param request запрос на планирование
      * @return результат операции планирования
      */
-    ScheduleResult schedule(T request) throws CztSchedulingException;
+    ScheduleResult schedule(T request) throws EzSchedulingException;
 
     /**
      * Перепланирует существующее задание на основе данного запроса.
@@ -27,5 +27,5 @@ public interface ScheduleExecutor<T> {
      * @param request запрос на перепланирование
      * @return результат операции перепланирования
      */
-    ScheduleResult reschedule(T request) throws CztSchedulingException;
+    ScheduleResult reschedule(T request) throws EzSchedulingException;
 }

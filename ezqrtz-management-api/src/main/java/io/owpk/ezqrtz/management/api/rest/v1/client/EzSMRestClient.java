@@ -6,7 +6,7 @@ import io.owpk.ezqrtz.management.api.model.TriggerDef;
 
 import java.util.List;
 
-public interface SMRestClient extends InboundManagementAdapter {
+public interface EzSMRestClient extends InboundManagementAdapter {
 
     List<TriggerDef> listTriggers(TriggerFilter filter);
 }

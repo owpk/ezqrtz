@@ -1,6 +1,6 @@
 package io.owpk.ezqrtz.management.api.rest.v1;
 
-import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import io.owpk.ezqrtz.management.api.ex.EzSchedulerManagementException;
 import io.owpk.ezqrtz.management.api.model.RemoteAdapterInfo;
 import io.owpk.ezqrtz.management.api.model.TriggerDef;
 import io.owpk.ezqrtz.management.api.rest.v1.dto.JobDefDto;
@@ -20,15 +20,15 @@ import java.util.Set;
 @NullMarked
 public interface InboundManagementAdapter {
 
-    JobDefDto getJob(String id) throws CztSchedulerManagementException;
+    JobDefDto getJob(String id) throws EzSchedulerManagementException;
 
-    JobDefInfoDto getJobDefinition(String id) throws CztSchedulerManagementException;
+    JobDefInfoDto getJobDefinition(String id) throws EzSchedulerManagementException;
 
-    List<JobDefInfoDto> listJobs() throws CztSchedulerManagementException;
+    List<JobDefInfoDto> listJobs() throws EzSchedulerManagementException;
 
-    TriggerDef getTrigger(String id) throws CztSchedulerManagementException;
+    TriggerDef getTrigger(String id) throws EzSchedulerManagementException;
 
-    Set<String> listTriggerGroups() throws CztSchedulerManagementException;
+    Set<String> listTriggerGroups() throws EzSchedulerManagementException;
 
     List<TriggerDef> listTriggers(
             String id,
@@ -37,22 +37,22 @@ public interface InboundManagementAdapter {
             String name,
             String cronExpression,
             LocalDateTime nextFireTimeFrom,
-            LocalDateTime nextFireTimeTo) throws CztSchedulerManagementException;
+            LocalDateTime nextFireTimeTo) throws EzSchedulerManagementException;
 
     TriggerModifiedResult createTrigger(
             TriggerDefCreateDto def,
             LocalDateTime startAt,
-            LocalDateTime endAt) throws CztSchedulerManagementException;
+            LocalDateTime endAt) throws EzSchedulerManagementException;
 
     TriggerModifiedResult updateTrigger(
             TriggerDefUpdateDto def,
             LocalDateTime startAt,
-            LocalDateTime endAt) throws CztSchedulerManagementException;
+            LocalDateTime endAt) throws EzSchedulerManagementException;
 
-    TriggerModifiedResult startTrigger(String id) throws CztSchedulerManagementException;
+    TriggerModifiedResult startTrigger(String id) throws EzSchedulerManagementException;
 
-    TriggerModifiedResult stopTrigger(String id) throws CztSchedulerManagementException;
+    TriggerModifiedResult stopTrigger(String id) throws EzSchedulerManagementException;
 
-    RemoteAdapterInfo getInfo() throws CztSchedulerManagementException;
+    RemoteAdapterInfo getInfo() throws EzSchedulerManagementException;
 
 }

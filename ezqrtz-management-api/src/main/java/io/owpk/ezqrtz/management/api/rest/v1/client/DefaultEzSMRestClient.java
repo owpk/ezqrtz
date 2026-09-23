@@ -6,7 +6,7 @@ import io.owpk.ezqrtz.management.api.rest.v1.dto.TriggerDefCreateDto;
 import io.owpk.ezqrtz.management.api.rest.v1.dto.TriggerDefUpdateDto;
 import io.owpk.ezqrtz.management.api.rest.v1.dto.TriggerModifiedResult;
 import io.owpk.ezqrtz.management.api.ex.RemoteSchedulerOperation;
-import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import io.owpk.ezqrtz.management.api.ex.EzSchedulerManagementException;
 import io.owpk.ezqrtz.management.api.model.RemoteAdapterInfo;
 import io.owpk.ezqrtz.management.api.model.TriggerDef;
 import io.owpk.ezqrtz.management.api.model.TriggerFilter;
@@ -42,7 +42,7 @@ import static io.owpk.ezqrtz.management.api.rest.v1.RestConstants.UPDATE_TRIGGER
 @Slf4j
 @NullMarked
 @RequiredArgsConstructor
-public abstract class DefaultSMRestClient implements SMRestClient {
+public abstract class DefaultEzSMRestClient implements EzSMRestClient {
 
     private final String baseUrl;
     private final boolean debug;
@@ -89,7 +89,7 @@ public abstract class DefaultSMRestClient implements SMRestClient {
     }
 
     @Override
-    public List<TriggerDef> listTriggers(String id, String description, String group, String name, String cronExpression, LocalDateTime nextFireTimeFrom, LocalDateTime nextFireTimeTo) throws CztSchedulerManagementException {
+    public List<TriggerDef> listTriggers(String id, String description, String group, String name, String cronExpression, LocalDateTime nextFireTimeFrom, LocalDateTime nextFireTimeTo) throws EzSchedulerManagementException {
         var filter = TriggerFilter.builder()
                 .id(id)
                 .group(group)
@@ -176,7 +176,7 @@ public abstract class DefaultSMRestClient implements SMRestClient {
     }
 
     @Override
-    public List<JobDefInfoDto> listJobs() throws CztSchedulerManagementException {
+    public List<JobDefInfoDto> listJobs() throws EzSchedulerManagementException {
         var url = buildUrl(LIST_JOBS_PATH);
         return getJobDefListInfoProvider().apply(url);
     }

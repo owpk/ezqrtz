@@ -1,10 +1,10 @@
 package io.owpk.ezqrtz.core;
 
 import io.owpk.ezqrtz.core.api.CollisionStrategy;
-import io.owpk.ezqrtz.core.api.CztQuartzScheduleExecutor;
+import io.owpk.ezqrtz.core.api.EzQuartzScheduleExecutor;
 import io.owpk.ezqrtz.core.api.QuartzTriggerNamesapce;
 import io.owpk.ezqrtz.core.api.SchedulerInterceptor;
-import io.owpk.ezqrtz.core.exception.CztSchedulingException;
+import io.owpk.ezqrtz.core.exception.EzSchedulingException;
 import io.owpk.ezqrtz.core.exception.SchedulerOperationException;
 import io.owpk.ezqrtz.core.model.CronTriggerDefinition;
 import io.owpk.ezqrtz.core.model.OnceTriggerDefinition;
@@ -39,7 +39,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
- * Реализация {@link CztQuartzScheduleExecutor} по умолчанию.
+ * Реализация {@link EzQuartzScheduleExecutor} по умолчанию.
  * <p>
  * Инкапсулирует работу с Quartz {@link Scheduler}: создание, удаление,
  * приостановку и возобновление задач и триггеров. Все операции с ключами
@@ -51,36 +51,36 @@ import static org.quartz.TriggerBuilder.newTrigger;
  */
 @Slf4j
 @NullMarked
-public class DefaultCztQuartzScheduleExecutor implements CztQuartzScheduleExecutor {
+public class DefaultEzQuartzScheduleExecutor implements EzQuartzScheduleExecutor {
 
     protected final List<SchedulerInterceptor> interceptors;
     protected final QuartzTriggerNamesapce namespace;
     @Getter
     private final Scheduler scheduler;
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            List<SchedulerInterceptor> interceptors) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           List<SchedulerInterceptor> interceptors) {
         this.namespace = new SchedulerNamespace();
         this.scheduler = scheduler;
         this.interceptors = interceptors;
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            List<SchedulerInterceptor> interceptors,
-                                            QuartzTriggerNamesapce namespace) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           List<SchedulerInterceptor> interceptors,
+                                           QuartzTriggerNamesapce namespace) {
         this.namespace = namespace;
         this.scheduler = scheduler;
         this.interceptors = interceptors;
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            QuartzTriggerNamesapce namespace) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           QuartzTriggerNamesapce namespace) {
         this(scheduler, List.of(), namespace);
     }
 
-    public DefaultCztQuartzScheduleExecutor(Scheduler scheduler,
-                                            String triggerGroup,
-                                            String jobGroup) {
+    public DefaultEzQuartzScheduleExecutor(Scheduler scheduler,
+                                           String triggerGroup,
+                                           String jobGroup) {
         this(scheduler, List.of(), SchedulerNamespace.builder()
                 .triggerGroup(triggerGroup)
                 .jobGroup(jobGroup)
@@ -233,27 +233,27 @@ public class DefaultCztQuartzScheduleExecutor implements CztQuartzScheduleExecut
     }
 
     @Override
-    public void pauseJob(String identity, Consumer<CztSchedulingException> onError) {
+    public void pauseJob(String identity, Consumer<EzSchedulingException> onError) {
         tryOr(() -> scheduler.pauseJob(namespace.jobKey(identity)), onError);
     }
 
     @Override
-    public void pauseTrigger(String identity, Consumer<CztSchedulingException> onError) {
+    public void pauseTrigger(String identity, Consumer<EzSchedulingException> onError) {
         tryOr(() -> scheduler.pauseTrigger(namespace.triggerKey(identity)), onError);
     }
 
     @Override
-    public void resumeJob(String identity, Consumer<CztSchedulingException> onError) {
+    public void resumeJob(String identity, Consumer<EzSchedulingException> onError) {
         tryOr(() -> scheduler.resumeJob(namespace.jobKey(identity)), onError);
     }
 
     @Override
-    public void resumeTrigger(String identity, Consumer<CztSchedulingException> onError) {
+    public void resumeTrigger(String identity, Consumer<EzSchedulingException> onError) {
         tryOr(() -> scheduler.resumeTrigger(namespace.triggerKey(identity)), onError);
     }
 
     @Override
-    public void deleteJob(String identity, Consumer<CztSchedulingException> onError) {
+    public void deleteJob(String identity, Consumer<EzSchedulingException> onError) {
         tryOr(() -> scheduler.deleteJob(namespace.jobKey(identity)), onError);
     }
 
@@ -390,11 +390,11 @@ public class DefaultCztQuartzScheduleExecutor implements CztQuartzScheduleExecut
         }
     }
 
-    private void tryOr(CheckedRunnable runnable, Consumer<? super CztSchedulingException> onError) {
+    private void tryOr(CheckedRunnable runnable, Consumer<? super EzSchedulingException> onError) {
         try {
             runnable.run();
         } catch (Exception e) {
-            onError.accept(new CztSchedulingException(e));
+            onError.accept(new EzSchedulingException(e));
         }
     }
 

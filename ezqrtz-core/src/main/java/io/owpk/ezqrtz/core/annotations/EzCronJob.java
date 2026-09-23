@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 @Documented
-public @interface CztCronJob {
+public @interface EzCronJob {
 
     String cron();
 

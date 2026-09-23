@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.function.Supplier;
 
 @NullMarked
-public final class TriggerNotFound extends CztSchedulerManagementException {
+public final class TriggerNotFound extends EzSchedulerManagementException {
     public TriggerNotFound(String message) {
         super(message);
     }

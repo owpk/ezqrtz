@@ -1,20 +1,20 @@
 package io.owpk.ezqrtz.core.exception;
 
-public sealed class CztSchedulingException extends RuntimeException
+public sealed class EzSchedulingException extends RuntimeException
         permits
         JobCollisionException,
         SchedulerOperationException,
         JobNotFound, TriggerNotFound {
 
-    public CztSchedulingException(String message) {
+    public EzSchedulingException(String message) {
         super(message);
     }
 
-    public CztSchedulingException(String message, Throwable cause) {
+    public EzSchedulingException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CztSchedulingException(Throwable cause) {
+    public EzSchedulingException(Throwable cause) {
         super(cause);
     }
 }

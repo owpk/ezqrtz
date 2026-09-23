@@ -1,7 +1,7 @@
 package io.owpk.ezqrtz.management.adapter;
 
 import io.owpk.ezqrtz.management.api.ex.AdapterNotFound;
-import io.owpk.ezqrtz.management.api.ex.CztSchedulerManagementException;
+import io.owpk.ezqrtz.management.api.ex.EzSchedulerManagementException;
 import io.owpk.ezqrtz.management.api.ex.JobNotFound;
 import io.owpk.ezqrtz.management.api.ex.RemoteErrorCode;
 import io.owpk.ezqrtz.management.api.ex.RemoteSchedulerOperation;
@@ -20,8 +20,8 @@ public class SchedulerManagementAdvice {
     public record ApiError(String code, String message) {
     }
 
-    @ExceptionHandler(CztSchedulerManagementException.class)
-    public ResponseEntity<ApiError> handleManagementException(CztSchedulerManagementException e) {
+    @ExceptionHandler(EzSchedulerManagementException.class)
+    public ResponseEntity<ApiError> handleManagementException(EzSchedulerManagementException e) {
         var entry = mapManagementException(e);
         log.error("Received scheduling management exception: {}, result response entry: {}",
                 e.getLocalizedMessage(), entry);
@@ -29,7 +29,7 @@ public class SchedulerManagementAdvice {
                 .body(new ApiError(entry.errCode().name(), e.getMessage()));
     }
 
-    private ErrEntry mapManagementException(CztSchedulerManagementException e) {
+    private ErrEntry mapManagementException(EzSchedulerManagementException e) {
         return switch (e) {
             // 404
             case AdapterNotFound _ -> new ErrEntry(HttpStatus.NOT_FOUND, RemoteErrorCode.ADAPTER_NOT_FOUND);
